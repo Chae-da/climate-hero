@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>기후 히어로 웹앱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#dff7f3;color:#20323a} button,input,textarea{font:inherit}
+  #app{max-width:760px;margin:0 auto;min-height:100vh;background:linear-gradient(160deg,#e0f7fa,#b3e5fc 42%,#e8f5e9);box-shadow:0 20px 70px #0002;position:relative;overflow:hidden}
+  nav{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:12px 12px 0;background:#ffffffb8;backdrop-filter:blur(10px);border-bottom:1px solid #81d4fa80}
+  .tab{border:0;border-radius:14px 14px 0 0;background:#fff8;padding:9px 2px;color:#546e7a;font-weight:800;font-size:12px;cursor:pointer}.tab span{display:block;font-size:18px}.tab.active{background:white;color:#0277bd;box-shadow:0 -2px 12px #0277bd22}
+  .screen{display:none;padding:16px}.screen.active{display:block}.title{font-size:21px;font-weight:950;text-align:center;color:#01579b;margin:4px 0 14px}.card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 24px #00000014;margin-bottom:13px}.muted{color:#607d8b;font-size:13px;line-height:1.6}.btn{border:0;border-radius:14px;padding:12px 16px;background:#0277bd;color:white;font-weight:900;cursor:pointer}.btn.green{background:#2e7d32}.btn.light{background:#e3f2fd;color:#0277bd}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.city{background:white;border-radius:16px;overflow:hidden;box-shadow:0 6px 18px #0001}.city-visual{height:86px;background:linear-gradient(150deg,#81d4fa,#e8f5e9);display:grid;place-items:center;font-size:38px;position:relative}.flood{position:absolute;inset:auto 0 0;height:0;background:#0277bd88;transition:.4s}.heat{position:absolute;inset:0;background:#e5393500;transition:.4s}.city b{display:block;text-align:center;padding-top:7px;font-size:13px}.city small{display:block;text-align:center;padding:2px 5px 9px;font-weight:800}.range-row{display:flex;align-items:center;gap:12px}.range-row input{flex:1;accent-color:#e53935}.temp{font-size:25px;font-weight:950;min-width:72px;text-align:right}.preset{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}.preset button{border:1px solid #b3e5fc;background:#f8fdff;border-radius:999px;padding:6px 11px;font-size:12px;font-weight:800;cursor:pointer}.bars{height:120px;display:flex;align-items:flex-end;gap:7px;margin:12px 0}.barbox{flex:1;text-align:center;font-size:10px;color:#607d8b}.bar{height:6px;background:#29b6f6;border-radius:8px 8px 0 0;transition:.4s}.warn{border-radius:14px;padding:12px;font-size:13px;font-weight:800}.safe{background:#e8f5e9;color:#2e7d32}.caution{background:#fff3e0;color:#e65100}.danger{background:#ffebee;color:#b71c1c}
+  .upload{border:2px dashed #90caf9;border-radius:18px;padding:22px;text-align:center;background:#f8fcff;cursor:pointer}.upload img{max-width:100%;border-radius:14px;display:none;margin-top:10px}.result{display:none;margin-top:12px;background:#f0f9ff;border:1px solid #b3e5fc;border-radius:16px;padding:14px;line-height:1.7;font-size:14px}
+  .hud{display:flex;justify-content:space-between;align-items:center;background:#ffffffdd;border-radius:18px;padding:11px 14px;margin-bottom:10px}.hud b{font-size:23px}.meter{width:130px;height:13px;background:#ddd;border-radius:99px;overflow:hidden}.meter div{height:100%;width:10%;background:#43a047;transition:.25s}.gamebox{position:relative;border-radius:22px;overflow:hidden;background:#111b2e;height:430px}.fall{position:absolute;font-size:36px;user-select:none;transition:transform .05s}.mouth{position:absolute;font-size:42px;left:50%;bottom:28px;transform:translateX(-50%)}.overlay{position:absolute;inset:0;background:#000b;color:white;display:grid;place-items:center;text-align:center;padding:24px;z-index:5}.overlay h2{font-size:25px}.guide{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.guide .card{font-size:13px;margin:0}.rank{display:flex;flex-direction:column;gap:7px}.rankrow{display:flex;align-items:center;gap:10px;background:#f8fcff;border-radius:14px;padding:10px 12px}.rankrow.mine{outline:2px solid #0277bd;background:#e3f2fd}.medal{font-size:22px;width:28px}.grow{flex:1}.score{font-size:18px;font-weight:950;color:#0277bd}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1.5px solid #c8e6c9;background:white;color:#2e7d32;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer}.chip.selected{background:#e8f5e9;border-color:#43a047;color:#1b5e20}.diary textarea{width:100%;min-height:90px;border:1.5px solid #ddd;border-radius:15px;padding:12px;resize:none;margin-top:10px}.feedback{display:none;background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid #a5d6a7;border-radius:18px;padding:14px;margin-bottom:12px;color:#1b5e20}.history{display:flex;flex-direction:column;gap:8px}.history .item{background:#f9fbe7;border-left:4px solid #a5d6a7;border-radius:0 12px 12px 0;padding:10px;font-size:12px}.dashgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{text-align:center;background:linear-gradient(135deg,#e3f2fd,#e8f5e9);border-radius:16px;padding:14px}.stat b{display:block;font-size:24px;color:#0277bd}.chat-fab{position:fixed;right:20px;bottom:18px;z-index:50}.chat-btn{width:58px;height:58px;border-radius:50%;border:0;background:#0277bd;color:white;font-size:28px;box-shadow:0 8px 24px #0277bd66;cursor:pointer}.chat{position:fixed;right:18px;bottom:86px;width:min(360px,92vw);height:460px;background:white;border-radius:22px;box-shadow:0 16px 50px #0003;display:none;flex-direction:column;overflow:hidden}.chat.open{display:flex}.chathead{background:#0277bd;color:white;padding:13px 16px;font-weight:900}.msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}.msg{max-width:86%;font-size:13px;line-height:1.55;padding:10px 12px;border-radius:16px;background:#eef4f8}.msg.user{align-self:flex-end;background:#0277bd;color:white}.chatinput{display:flex;gap:6px;padding:10px;border-top:1px solid #eee}.chatinput input{flex:1;border:1px solid #ddd;border-radius:999px;padding:10px 13px}.chatinput button{border:0;border-radius:50%;width:40px;background:#0277bd;color:white;font-weight:900}@media(min-width:620px){.city-visual{height:115px}.screen{padding:20px}.grid3{gap:14px}.dashgrid{grid-template-columns:repeat(4,1fr)}}
+
+/* ===== Imported SIM tab styles from preview_step6_sea_2021_4mm_fix ===== */
+/* ===== SIM ===== */
+.sim-title{text-align:center;font-size:18px;font-weight:900;color:#01579B;margin-bottom:6px;}
+.sim-subtitle{text-align:center;font-size:12px;color:#546E7A;line-height:1.6;margin-bottom:12px;}
+.climate-step{background:white;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.climate-step h3{font-size:14px;font-weight:900;color:#01579B;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.city-input-row{display:flex;gap:8px;margin-bottom:10px;}
+.city-input{flex:1;border:2px solid #B3E5FC;border-radius:12px;padding:11px 13px;font-family:inherit;font-size:14px;font-weight:700;color:#263238;outline:none;}
+.city-input:focus{border-color:#0277BD;box-shadow:0 0 0 3px rgba(2,119,189,0.08);}
+.city-apply-btn{border:none;border-radius:12px;background:linear-gradient(135deg,#0277BD,#01579B);color:white;padding:0 14px;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;}
+.city-chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.city-sample-chip{border:1.5px solid #B3E5FC;background:#F0F9FF;color:#0277BD;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.climate-upload-zone{border:2px dashed #B3E5FC;border-radius:14px;background:#F8FCFF;padding:16px;text-align:center;cursor:pointer;transition:all .2s;}
+.climate-upload-zone:hover{border-color:#0277BD;background:#E3F2FD;}
+.climate-upload-zone p{font-size:13px;color:#546E7A;line-height:1.6;margin-top:5px;}
+.daily-life-input{width:100%;min-height:115px;border:2px solid #B3E5FC;border-radius:14px;padding:12px 13px;font-family:inherit;font-size:14px;line-height:1.6;resize:vertical;outline:none;background:#F8FCFF;color:#263238;}
+.daily-life-input:focus{border-color:#0277BD;box-shadow:0 0 0 3px rgba(2,119,189,0.08);background:white;}
+.climate-photo-wrap{display:none;position:relative;border-radius:14px;overflow:hidden;margin-top:10px;background:#ECEFF1;}
+#climatePhotoPreview,#climateGeneratedImg{width:100%;height:220px;object-fit:cover;display:block;}
+.climate-photo-label{position:absolute;left:10px;top:10px;background:rgba(1,87,155,.88);color:white;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;}
+.temp-control{background:white;border-radius:16px;padding:13px 14px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.temp-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.temp-label{font-size:13px;font-weight:900;color:#37474F;flex-shrink:0;}
+.temp-value{font-size:21px;font-weight:900;min-width:58px;text-align:center;}
+input[type=range]{flex:1;accent-color:#E53935;}
+.preset-btns{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;}
+.preset-btn{font-size:11px;padding:5px 9px;border-radius:16px;border:1.5px solid;cursor:pointer;font-family:inherit;font-weight:700;}
+.chart-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.chart-card{background:white;border-radius:16px;padding:13px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.chart-card h3{font-size:14px;font-weight:900;color:#01579B;margin-bottom:4px;}
+.chart-desc{font-size:11px;color:#78909C;margin-bottom:7px;line-height:1.5;}
+.chart-canvas{width:100%;height:190px;border-radius:12px;background:#FAFDFF;border:1px solid #E3F2FD;}
+.climate-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.summary-card{border-radius:12px;padding:10px 8px;text-align:center;background:linear-gradient(135deg,#E3F2FD,#E8F5E9);}
+.summary-num{font-size:18px;font-weight:900;color:#0277BD;}
+.summary-label{font-size:10px;color:#546E7A;margin-top:2px;line-height:1.4;}
+.ai-climate-btn{width:100%;background:linear-gradient(135deg,#6A1B9A,#0277BD);border:none;border-radius:12px;padding:13px;color:white;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;margin-top:10px;}
+.ai-climate-btn:disabled{background:#B0BEC5;cursor:not-allowed;}
+.ai-note{font-size:11px;color:#78909C;line-height:1.6;margin-top:8px;background:#F5F7FA;border-radius:10px;padding:8px 10px;}
+.ai-loading{text-align:center;padding:14px;color:#0277BD;font-size:13px;display:none;}
+.ai-result{background:#F0F9FF;border-radius:14px;padding:13px;margin-top:10px;display:none;border:1px solid #B3E5FC;}
+.ai-result h4{font-size:13px;font-weight:900;color:#01579B;margin-bottom:8px;}
+.ai-result p{font-size:13px;color:#263238;line-height:1.7;}
+.generated-wrap{display:none;position:relative;border-radius:14px;overflow:hidden;margin-top:10px;background:#ECEFF1;border:1.5px solid #B3E5FC;}
+.generated-caption{font-size:12px;color:#455A64;line-height:1.6;padding:10px;background:white;}
+@media (min-width: 600px){.chart-grid{grid-template-columns:1fr 1fr}.chart-canvas{height:220px}.city-input{font-size:16px}.climate-step h3,.chart-card h3{font-size:16px}#climatePhotoPreview,#climateGeneratedImg{height:280px}.summary-num{font-size:22px}}
+
+
+
+  /* 게임·실천일기 탭 여백 최소화 */
+  #game.screen,#diary.screen{padding:8px 8px 12px;}
+  #game .hud{margin-bottom:6px;border-radius:14px;}
+  #game .gamebox{height:420px;border-radius:18px;}
+  #game .guide{gap:6px;margin-top:6px;}
+  #game .guide .card{padding:10px;margin:0;}
+  #game > .card{padding:12px;margin-top:6px;margin-bottom:8px;}
+  #diary .title{margin:0 0 8px;}
+  #diary .card{padding:12px;margin-bottom:8px;}
+  #diary textarea{margin-top:8px;min-height:78px;}
+  #game .overlay{overflow:auto;align-items:start;padding:14px;}
+  .game-over-panel{width:min(100%,520px);max-height:calc(100% - 16px);overflow:auto;background:rgba(0,0,0,.18);border-radius:18px;padding:14px 14px 16px;}
+  .game-over-panel h2{font-size:22px;margin:2px 0 8px;}
+  .game-over-panel p{margin:6px 0;}
+  .game-summary-list{max-height:150px;overflow:auto;text-align:left;margin:8px 0;background:rgba(255,255,255,.12);border-radius:14px;padding:8px;}
+  .game-summary-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;line-height:1.45;border-bottom:1px solid rgba(255,255,255,.16);padding:4px 0;}
+  .game-summary-row:last-child{border-bottom:0;}
+  .game-summary-total{font-size:14px;line-height:1.5;margin:8px 0;color:#c8e6c9;font-weight:900;}
+  .score-save-box{display:grid;grid-template-columns:1fr;gap:7px;margin-top:8px;}
+  .score-save-box input{width:100%;padding:12px;border-radius:12px;border:0;text-align:center;font-weight:800;}
+  .score-save-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .score-save-actions .btn{width:100%;padding:11px 8px;}
+  .rank-note{font-size:11px;color:#78909c;line-height:1.5;margin-top:8px;}
+
+
+/* 탭 바로 밑 여백 제거: 게임/실천일기 */
+#game.screen,#diary.screen{padding-top:0!important;margin-top:0!important;}
+#game .hud,#diary .title{margin-top:0!important;}
+@media(min-width:620px){#game.screen,#diary.screen{padding-top:0!important;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav>
+    <button class="tab active" data-screen="sim"><span>🌊</span>시뮬레이션</button>
+    <button class="tab" data-screen="game"><span>🎮</span>게임</button>
+    <button class="tab" data-screen="diary"><span>📔</span>실천일기</button>
+    <button class="tab" data-screen="teacher"><span>👩‍🏫</span>교사화면</button>
+  </nav>
+
+  <section id="sim" class="screen active">
+
+    <div class="sim-title">🌡️ 도시 기후 변화 AI 시뮬레이션</div>
+    <div class="sim-subtitle">도시 이름과 사진을 넣으면, 지구 온도 상승에 따른 도시 기온·해수면 변화를 그래프로 보고 사진 변화도 시뮬레이션해요.</div>
+
+    <div class="climate-step">
+      <h3>1️⃣ 도시 입력</h3>
+      <div class="city-input-row">
+        <input class="city-input" id="cityNameInput" placeholder="예: 서울, 부산, 인천, 제주" value="서울">
+        <button class="city-apply-btn" onclick="applyCityClimate()">적용</button>
+      </div>
+      <div class="city-chip-row">
+        <button class="city-sample-chip" onclick="setCityExample('서울')">서울</button>
+        <button class="city-sample-chip" onclick="setCityExample('부산')">부산</button>
+        <button class="city-sample-chip" onclick="setCityExample('인천')">인천</button>
+        <button class="city-sample-chip" onclick="setCityExample('제주')">제주</button>
+        <button class="city-sample-chip" onclick="setCityExample('목포')">목포</button>
+      </div>
+      <h3 style="margin-top:8px;">2️⃣ 나의 일상 표현</h3>
+      <textarea class="daily-life-input" id="dailyLifeInput" placeholder="예: 학교 운동장에서 친구들과 축구를 했어요. 점심시간에 급식을 먹고 집에 갈 때 버스를 탔어요." oninput="onDailyLifeInput()"></textarea>
+      <p class="ai-note" style="margin-top:8px;">내가 표현한 일상이 지구온난화가 지속되면 어떻게 달라질지 AI가 글과 이미지로 보여줘요.</p>
+    </div>
+
+    <div class="temp-control">
+      <div class="temp-row">
+        <div class="temp-label">지구 평균 온도 상승</div>
+        <input type="range" id="tempSlider" min="0" max="4" step="0.5" value="1.5" oninput="updateSim(this.value)">
+        <div class="temp-value" id="tempDisplay" style="color:#FF9800">+1.5°C</div>
+      </div>
+      <div class="preset-btns">
+        <button class="preset-btn" onclick="setTemp(0)" style="border-color:#e0e0e0;background:white;color:#546E7A">현재</button>
+        <button class="preset-btn" onclick="setTemp(1)" style="border-color:#FFF9C4;background:#FFFDE7;color:#F57F17">+1°C</button>
+        <button class="preset-btn" onclick="setTemp(1.5)" style="border-color:#FFE082;background:#FFF8E1;color:#E65100">+1.5°C</button>
+        <button class="preset-btn" onclick="setTemp(2)" style="border-color:#FFAB91;background:#FBE9E7;color:#BF360C">+2°C</button>
+        <button class="preset-btn" onclick="setTemp(3)" style="border-color:#EF9A9A;background:#FFEBEE;color:#B71C1C">+3°C</button>
+        <button class="preset-btn" onclick="setTemp(4)" style="border-color:#CE93D8;background:#F3E5F5;color:#6A1B9A">+4°C</button>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>📈 입력 도시의 기온 변화</h3>
+        <div class="chart-desc" id="cityChartDesc">도시별 기후 특성을 바탕으로 2020~2100년 평균기온 변화를 보여줘요.</div>
+        <canvas class="chart-canvas" id="cityTempChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>🌊 지구 온도 상승과 해수면 변화</h3>
+        <div class="chart-desc" id="seaChartDesc">txt 파일의 관측 해수면 자료와 2040·2060·2080년 예측값을 함께 보여줘요.</div>
+        <canvas class="chart-canvas" id="tempSeaChart"></canvas>
+      </div>
+    </div>
+
+    <div class="climate-summary">
+      <div class="summary-card"><div class="summary-num" id="summaryCity">서울</div><div class="summary-label">입력한 도시</div></div>
+      <div class="summary-card"><div class="summary-num" id="summaryTemp">-</div><div class="summary-label">2080년 도시 평균기온</div></div>
+      <div class="summary-card"><div class="summary-num" id="summarySea">-</div><div class="summary-label">2080년 예상 해수면</div></div>
+    </div>
+
+    <div class="climate-step" style="margin-top:12px;">
+      <h3>3️⃣ AI 일상 변화 시뮬레이션</h3>
+      <button class="ai-climate-btn" id="generateClimateBtn" onclick="generateClimateImage()" disabled>🤖 나의 일상 변화 글·이미지 생성</button>
+      <div class="ai-note">※ Hugging Face FLUX.1-schnell 이미지 생성 API와 연결되어, 입력한 일상을 바탕으로 지구온난화 이후의 모습을 AI 이미지로 보여줍니다.</div>
+      <div class="ai-loading" id="aiLoading">🤖 입력한 일상을 바탕으로 지구온난화 이후의 변화를 글과 이미지로 표현하고 있어요...</div>
+      <div class="generated-wrap" id="generatedWrap">
+        <img id="climateGeneratedImg" alt="기후 변화 후 시뮬레이션 이미지">
+        <div class="generated-caption" id="generatedCaption"></div>
+      </div>
+      <div class="ai-result" id="aiResult">
+        <h4 id="aiResultTitle"></h4>
+        <p id="aiResultBody"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="hud"><div>점수<br><b id="score" style="color:#43a047">0</b></div><div>🌡️ 위험도<div class="meter"><div id="heatFill"></div></div><small id="heatText">10%</small></div><div>남은 시간<br><b id="time" style="color:#0277bd">60s</b></div></div>
+    <div class="gamebox" id="gamebox">
+      <video id="faceCam" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;transform:scaleX(-1)"></video>
+      <canvas id="faceCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+      <div class="mouth" id="mouth" style="width:60px;height:60px;border:4px solid rgba(76,175,80,.9);border-radius:50%;background:rgba(76,175,80,.15);display:flex;align-items:center;justify-content:center;font-size:0;box-shadow:0 0 20px rgba(76,175,80,.45);"></div>
+      <div class="overlay" id="gameOverlay"><div><h2>🌍 지구지키기 게임</h2><p>태블릿 카메라에 얼굴을 비추면<br>입 위치를 따라 😮가 움직여요.<br>탄소 감축 아이템을 먹고 오염 아이템은 피하세요!</p><button class="btn" id="cameraBtn" style="margin-bottom:10px">📷 카메라 연결</button><br><button class="btn green" id="startGame">🎮 게임 시작</button></div></div></div>
+    <div class="guide"><div class="card"><b style="color:#2e7d32">✅ 먹기</b><p>🧺 장바구니(+4), 🥣 반찬통(+2), 🚲 자전거(+40), 🚌 버스(+200), 🍽️ 다 먹은 급식(+0.1), ♻️ 분리수거(+17), 🍶 텀블러(+4), 🔌 불끄기(+68)</p></div><div class="card"><b style="color:#c62828">❌ 피하기</b><p>🛍 비닐(+20), 🥤 플라스틱(+15), 🚗 자동차(+25), 💻 컴퓨터 사용(+20), 🧾 종이영수증(+5), 🛒 새로운 물건구입(+20)</p></div></div>
+    <div class="card"><b>🏆 명예의 전당</b><div id="rank" class="rank" style="margin-top:10px"></div><div class="rank-note">※ 구글 시트 공유 저장: Apps Script 배포 후 받은 웹앱 URL을 코드의 SHARED_RANK_API_URL에 넣으면 여러 기기에서 같은 순위를 불러옵니다.</div></div>
+  </section>
+
+  <section id="diary" class="screen diary">
+    <div class="title" style="color:#2e7d32">📔 나의 실천일기</div>
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b id="co2Total">0g</b><br><small>누적 CO₂ 절감량</small></div><div style="text-align:right"><b id="streak">0일</b><br><small>연속 실천 🔥</small></div></div>
+    <div id="feedback" class="feedback"></div>
+    <div class="card"><b>오늘 실천한 행동 ✅</b><div id="chips" class="chips" style="margin-top:10px"></div><textarea id="diaryText" placeholder="오늘 실천한 일과 느낀 점을 써봐요!"></textarea><button class="btn green" id="saveDiary" style="width:100%;margin-top:10px">📝 오늘 일기 저장하기</button><button class="btn light" id="askDiary" style="width:100%;margin-top:8px">🤖 AI와 오늘 실천 더 탐구하기</button></div>
+    <div class="card"><b>📅 지난 실천 기록</b><div id="history" class="history" style="margin-top:10px"></div></div>
+  </section>
+
+  <section id="teacher" class="screen">
+    <div class="title">👩‍🏫 교사 대시보드</div>
+    <div id="gate" class="card" style="text-align:center"><div style="font-size:42px">🔐</div><p class="muted">교사 전용 화면입니다. 기본 비밀번호는 1234입니다.</p><input id="pw" type="password" placeholder="••••" style="text-align:center;border:2px solid #b3e5fc;border-radius:14px;padding:12px;width:180px"><br><button class="btn" id="enter" style="margin-top:10px">입장하기</button></div>
+    <div id="dash" style="display:none"><div class="card"><b>📊 오늘의 우리 반 현황</b><div class="dashgrid" style="margin-top:10px"><div class="stat"><b id="ds1">0명</b><small>일기 쓴 학생</small></div><div class="stat"><b id="ds2">0g</b><small>오늘 절감</small></div><div class="stat"><b id="ds3">0일</b><small>최장 연속</small></div><div class="stat"><b id="ds4">0개</b><small>총 실천</small></div></div></div><div class="card"><b>👦 학생별 현황</b><div id="students" class="history" style="margin-top:10px"></div></div></div>
+  </section>
+</div>
+
+<div class="chat-fab"><div id="chat" class="chat"><div class="chathead">🌍 지구 지킴이 챗봇</div><div id="msgs" class="msgs"><div class="msg">안녕! 기후위기와 실천 방법을 함께 탐구해보자 🌱</div></div><div class="chatinput"><input id="chatInput" placeholder="궁금한 것을 입력해봐!"><button id="send">➤</button></div></div><button id="chatBtn" class="chat-btn">🌍</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get:k=>JSON.parse(localStorage.getItem(k)||'null'),set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),keys:p=>Object.keys(localStorage).filter(k=>k.startsWith(p))};
+const actions=[['🧺','장바구니',4],['🥣','반찬통',2],['🚲','자전거',40],['🚌','버스',200],['🍽️','다 먹은 급식',0.1],['♻️','분리수거',17],['🍶','텀블러',4],['🔌','불끄기',68]];
+let selected=new Set();
+function show(name){$$('.screen').forEach(x=>x.classList.remove('active'));$('#'+name).classList.add('active');$$('.tab').forEach(x=>x.classList.toggle('active',x.dataset.screen===name)); if(name==='teacher') loadDash();}
+$$('.tab').forEach(b=>b.onclick=()=>show(b.dataset.screen));
+// ===== CITY CLIMATE SIMULATION =====
+const TEMP_NORMALS = {"속초":{"1991-2000":12.3,"2001-2010":12.4,"2011-2020":12.8},"철원":{"1991-2000":10.1,"2001-2010":10.2,"2011-2020":10.6},"대관령":{"1991-2000":6.5,"2001-2010":7.3,"2011-2020":7.5},"춘천":{"1991-2000":11.1,"2001-2010":11.4,"2011-2020":11.7},"강릉":{"1991-2000":13.3,"2001-2010":13.4,"2011-2020":13.7},"서울":{"1991-2000":12.8,"2001-2010":12.8,"2011-2020":13.0},"인천":{"1991-2000":12.2,"2001-2010":12.7,"2011-2020":12.6},"원주":{"1991-2000":11.4,"2001-2010":12.0,"2011-2020":12.5},"울릉도":{"1991-2000":12.6,"2001-2010":12.6,"2011-2020":12.9},"수원":{"1991-2000":12.3,"2001-2010":12.4,"2011-2020":12.8},"충주":{"1991-2000":11.3,"2001-2010":11.7,"2011-2020":12.1},"서산":{"1991-2000":12.0,"2001-2010":12.0,"2011-2020":12.3},"울진":{"1991-2000":12.7,"2001-2010":12.9,"2011-2020":13.0},"청주":{"1991-2000":12.5,"2001-2010":13.1,"2011-2020":13.6},"대전":{"1991-2000":12.8,"2001-2010":13.1,"2011-2020":13.4},"추풍령":{"1991-2000":11.8,"2001-2010":11.8,"2011-2020":11.9},"안동":{"1991-2000":12.0,"2001-2010":12.0,"2011-2020":12.6},"포항":{"1991-2000":14.4,"2001-2010":14.5,"2011-2020":14.8},"군산":{"1991-2000":13.0,"2001-2010":13.1,"2011-2020":13.1},"울산":{"1991-2000":14.2,"2001-2010":14.5,"2011-2020":14.5},"창원":{"1991-2000":14.9,"2001-2010":14.8,"2011-2020":14.6},"광주":{"1991-2000":13.9,"2001-2010":14.2,"2011-2020":14.4},"부산":{"1991-2000":14.9,"2001-2010":14.8,"2011-2020":15.2},"통영":{"1991-2000":14.4,"2001-2010":14.8,"2011-2020":14.7},"목포":{"1991-2000":14.1,"2001-2010":13.9,"2011-2020":14.0},"여수":{"1991-2000":14.4,"2001-2010":14.5,"2011-2020":14.8},"완도":{"1991-2000":14.3,"2001-2010":14.1,"2011-2020":14.6},"제주":{"1991-2000":15.9,"2001-2010":16.1,"2011-2020":16.5},"고산":{"1991-2000":15.5,"2001-2010":15.7,"2011-2020":15.8},"성산":{"1991-2000":15.3,"2001-2010":15.6,"2011-2020":15.8},"서귀포":{"1991-2000":16.6,"2001-2010":17.2,"2011-2020":16.9},"진주":{"1991-2000":13.2,"2001-2010":13.6,"2011-2020":13.4},"강화":{"1991-2000":11.2,"2001-2010":11.2,"2011-2020":11.5},"양평":{"1991-2000":11.2,"2001-2010":11.8,"2011-2020":12.2},"이천":{"1991-2000":11.6,"2001-2010":11.6,"2011-2020":11.9},"인제":{"1991-2000":10.0,"2001-2010":10.4,"2011-2020":10.7},"홍천":{"1991-2000":10.3,"2001-2010":10.8,"2011-2020":11.5},"태백":{"1991-2000":8.6,"2001-2010":9.0,"2011-2020":9.3},"제천":{"1991-2000":10.0,"2001-2010":10.4,"2011-2020":10.6},"보은":{"1991-2000":10.8,"2001-2010":11.3,"2011-2020":11.5},"천안":{"1991-2000":11.7,"2001-2010":12.0,"2011-2020":12.3},"보령":{"1991-2000":12.4,"2001-2010":12.9,"2011-2020":12.9},"부여":{"1991-2000":12.2,"2001-2010":12.5,"2011-2020":12.6},"금산":{"1991-2000":11.4,"2001-2010":11.8,"2011-2020":12.0},"부안":{"1991-2000":12.6,"2001-2010":13.1,"2011-2020":13.2},"임실":{"1991-2000":10.9,"2001-2010":11.5,"2011-2020":11.6},"정읍":{"1991-2000":13.1,"2001-2010":13.4,"2011-2020":13.4},"남원":{"1991-2000":12.2,"2001-2010":12.5,"2011-2020":12.8},"장수":{"1991-2000":10.3,"2001-2010":10.7,"2011-2020":11.0},"장흥":{"1991-2000":12.9,"2001-2010":13.2,"2011-2020":13.8},"해남":{"1991-2000":13.5,"2001-2010":13.5,"2011-2020":13.5},"고흥":{"1991-2000":13.5,"2001-2010":13.7,"2011-2020":13.8},"봉화":{"1991-2000":10.0,"2001-2010":9.7,"2011-2020":10.2},"영주":{"1991-2000":11.6,"2001-2010":11.6,"2011-2020":11.8},"문경":{"1991-2000":11.8,"2001-2010":11.6,"2011-2020":12.3},"영덕":{"1991-2000":12.7,"2001-2010":13.1,"2011-2020":13.5},"의성":{"1991-2000":11.2,"2001-2010":11.5,"2011-2020":12.1},"구미":{"1991-2000":12.6,"2001-2010":13.1,"2011-2020":13.6},"영천":{"1991-2000":12.4,"2001-2010":12.7,"2011-2020":13.2},"거창":{"1991-2000":11.5,"2001-2010":12.2,"2011-2020":12.2},"합천":{"1991-2000":12.9,"2001-2010":13.5,"2011-2020":13.4},"밀양":{"1991-2000":13.3,"2001-2010":13.6,"2011-2020":14.0},"산청":{"1991-2000":12.6,"2001-2010":13.1,"2011-2020":13.3},"거제":{"1991-2000":14.0,"2001-2010":14.2,"2011-2020":14.9},"남해":{"1991-2000":14.1,"2001-2010":14.3,"2011-2020":14.7},"대구":{"1991-2000":14.2,"2001-2010":14.5,"2011-2020":14.9},"전주":{"1991-2000":13.4,"2001-2010":13.8,"2011-2020":13.9},"동두천":{"2001-2010":11.2,"2011-2020":11.8},"백령도":{"2001-2010":11.1,"2011-2020":11.4},"동해":{"2001-2010":12.7,"2011-2020":13.3},"영월":{"2001-2010":10.9,"2011-2020":11.7},"흑산도":{"2001-2010":13.3,"2011-2020":13.7},"강남":{"2001-2010":13.5,"2011-2020":13.7},"서초":{"2001-2010":13.8,"2011-2020":13.7},"강동":{"2001-2010":12.9,"2011-2020":13.0},"송파":{"2001-2010":13.8,"2011-2020":13.9},"강서":{"2001-2010":12.9,"2011-2020":13.1},"양천":{"2001-2010":13.8,"2011-2020":13.8},"도봉":{"2001-2010":12.3,"2011-2020":12.3},"노원":{"2001-2010":12.2,"2011-2020":11.9},"동대문":{"2001-2010":13.8,"2011-2020":13.5},"중랑":{"2001-2010":13.4,"2011-2020":13.9},"기상청":{"2001-2010":13.4,"2011-2020":13.5},"마포":{"2001-2010":13.6,"2011-2020":13.2},"서대문":{"2001-2010":12.3,"2011-2020":12.6},"광진":{"2001-2010":13.7,"2011-2020":13.6},"성북":{"2001-2010":12.6,"2011-2020":12.6},"용산":{"2001-2010":13.6,"2011-2020":13.7},"은평":{"2001-2010":12.8,"2011-2020":11.5},"금천":{"2001-2010":13.5,"2011-2020":13.4},"중구":{"2001-2010":11.7,"2011-2020":12.0},"성동":{"2001-2010":13.6,"2011-2020":13.8},"포천":{"2001-2010":11.5,"2011-2020":11.2},"가평조종":{"2001-2010":9.9,"2011-2020":10.5},"영등포":{"2001-2010":13.8,"2011-2020":14.0},"인천연수":{"2001-2010":12.6,"2011-2020":12.8},"안성":{"2001-2010":12.6,"2011-2020":12.5},"간성":{"2001-2010":11.7,"2011-2020":12.2},"평창":{"2001-2010":10.1,"2011-2020":10.2},"의정부":{"2001-2010":11.9,"2011-2020":11.7},"횡성":{"2001-2010":11.1,"2011-2020":11.3},"고양":{"2001-2010":11.8,"2011-2020":11.8},"남양주":{"2001-2010":11.0,"2011-2020":12.0},"안산":{"2001-2010":11.6,"2011-2020":11.5},"경기광주":{"2001-2010":11.9,"2011-2020":11.5},"여주":{"2001-2010":11.8,"2011-2020":11.7},"용인":{"2001-2010":11.5,"2011-2020":11.7},"오산":{"2001-2010":12.4,"2011-2020":12.4},"평택":{"2001-2010":12.7,"2011-2020":12.8},"화천":{"2001-2010":10.5,"2011-2020":10.6},"양구":{"2001-2010":10.0,"2011-2020":10.3},"시흥":{"2001-2010":12.9,"2011-2020":12.5},"구리":{"2001-2010":12.6,"2011-2020":12.7},"금곡":{"2001-2010":11.8,"2011-2020":11.8},"화성":{"2001-2010":12.3,"2011-2020":12.5},"성남":{"2001-2010":13.3,"2011-2020":12.9},"과천":{"2001-2010":12.6,"2011-2020":12.5},"진부령":{"2001-2010":8.7,"2011-2020":8.7},"양주":{"2001-2010":11.3,"2011-2020":10.9},"단양":{"2001-2010":11.5,"2011-2020":11.9},"진천":{"2001-2010":11.5,"2011-2020":11.9},"괴산":{"2001-2010":11.2,"2011-2020":11.3},"옥천":{"2001-2010":12.1,"2011-2020":12.3},"홍북":{"2001-2010":11.9,"2011-2020":12.0},"세종연서":{"2001-2010":12.0,"2011-2020":12.2},"공주":{"2001-2010":12.6,"2011-2020":12.5},"서천":{"2001-2010":12.5,"2011-2020":12.7},"논산":{"2001-2010":12.5,"2011-2020":12.7},"당진":{"2001-2010":11.9,"2011-2020":12.1},"청양":{"2001-2010":11.6,"2011-2020":11.3},"음성":{"2001-2010":11.1,"2011-2020":11.0},"증평":{"2001-2010":11.5,"2011-2020":12.4},"태안":{"2001-2010":12.7,"2011-2020":12.7},"예산":{"2001-2010":12.4,"2011-2020":12.6},"아산":{"2001-2010":12.4,"2011-2020":12.6},"계룡":{"2001-2010":12.0,"2011-2020":11.3},"문화":{"2001-2010":13.5,"2011-2020":13.7},"세천":{"2001-2010":12.4,"2011-2020":11.9},"장동":{"2001-2010":12.8,"2011-2020":12.0},"연천청산":{"2001-2010":11.6,"2011-2020":11.1},"무안":{"2001-2010":13.5,"2011-2020":13.3},"무주":{"2001-2010":11.7,"2011-2020":11.6},"익산":{"2001-2010":13.0,"2011-2020":13.1},"진안":{"2001-2010":11.1,"2011-2020":11.1},"담양":{"2001-2010":13.2,"2011-2020":13.2},"광산":{"2001-2010":13.6,"2011-2020":13.5},"구례":{"2001-2010":13.6,"2011-2020":13.3},"나주":{"2001-2010":13.8,"2011-2020":13.3},"순천시":{"2001-2010":14.8,"2011-2020":14.9},"광양읍":{"2001-2010":14.5,"2011-2020":14.5},"조선대":{"2001-2010":14.3,"2011-2020":14.0},"거문도":{"2001-2010":15.5,"2011-2020":15.8},"추자도":{"2001-2010":15.1,"2011-2020":15.0},"장성":{"2001-2010":12.9,"2011-2020":12.9},"영암":{"2001-2010":13.8,"2011-2020":13.5},"보성":{"2001-2010":12.3,"2011-2020":12.7},"완주":{"2001-2010":13.0,"2011-2020":12.8},"김제":{"2001-2010":13.5,"2011-2020":13.1},"화순":{"2001-2010":13.4,"2011-2020":13.5},"함평":{"2001-2010":13.8,"2011-2020":13.7},"곡성":{"2001-2010":13.1,"2011-2020":12.8},"성판악":{"2001-2010":10.9,"2011-2020":11.0},"압해도":{"2001-2010":14.2,"2011-2020":13.8},"영양":{"2001-2010":11.0,"2011-2020":11.3},"성주":{"2001-2010":13.1,"2011-2020":12.9},"고령":{"2001-2010":12.8,"2011-2020":12.8},"청도":{"2001-2010":13.0,"2011-2020":12.9},"예천":{"2001-2010":11.9,"2011-2020":11.8},"김천":{"2001-2010":13.0,"2011-2020":12.2},"군위":{"2001-2010":11.9,"2011-2020":11.8},"칠곡":{"2001-2010":13.2,"2011-2020":13.6},"경산":{"2001-2010":14.1,"2011-2020":14.2},"달성":{"2001-2010":14.2,"2011-2020":14.2},"서구":{"2001-2010":14.6,"2011-2020":14.2},"울기":{"2001-2010":14.5,"2011-2020":14.1},"삼천포":{"2001-2010":14.8,"2011-2020":14.6},"영도":{"2001-2010":14.6,"2011-2020":14.0},"고성":{"2001-2010":14.6,"2011-2020":13.8},"창녕":{"2001-2010":13.4,"2011-2020":13.7},"함안":{"2001-2010":12.9,"2011-2020":13.4},"가덕도":{"2001-2010":14.6,"2011-2020":14.8},"기장":{"2001-2010":14.2,"2011-2020":14.7},"간절곶":{"2001-2010":14.4,"2011-2020":14.5},"하동":{"2001-2010":14.6,"2011-2020":14.4},"해운대":{"2001-2010":15.4,"2011-2020":14.7},"부산진":{"2001-2010":15.0,"2011-2020":14.9},"동래":{"2001-2010":15.3,"2011-2020":14.7},"북구":{"2001-2010":14.3,"2011-2020":14.9},"부산남구":{"2001-2010":15.4,"2011-2020":15.5},"정자":{"2001-2010":14.4,"2011-2020":14.5},"파주":{"2011-2020":11.0},"상주":{"2011-2020":12.9},"고창":{"2011-2020":13.2},"정선군":{"2011-2020":10.7},"영광군":{"2011-2020":13.1},"김해시":{"2011-2020":15.0},"순창군":{"2011-2020":12.8},"양산시":{"2011-2020":14.9},"강진군":{"2011-2020":13.8},"의령군":{"2011-2020":13.2},"함양군":{"2011-2020":12.8},"진도군":{"2011-2020":13.9},"청송군":{"2011-2020":11.2},"경주시":{"2011-2020":13.4},"구로":{"2011-2020":12.8},"강북":{"2011-2020":13.4},"남현":{"2011-2020":12.4},"부천":{"2011-2020":13.2},"안양":{"2011-2020":13.0},"광명":{"2011-2020":13.6},"군포":{"2011-2020":13.5},"김포":{"2011-2020":11.6},"하남":{"2011-2020":12.8},"의왕":{"2011-2020":11.5},"부평":{"2011-2020":12.1},"양양":{"2011-2020":12.9},"사북":{"2011-2020":8.6},"풍암":{"2011-2020":14.2},"삼척":{"2011-2020":13.3}};
+const SEA_LEVEL_DATA = {"인천":{"1989":459.5,"1990":461.8,"1991":457.6,"1992":457.2,"1993":458.9,"1994":458.6,"1995":456.4,"1996":455.2,"1997":455.8,"1998":463.9,"1999":459.6,"2000":460.5,"2001":461.1,"2002":461.4,"2003":462.0,"2004":463.3,"2005":458.3,"2006":462.2,"2007":463.7,"2008":461.2,"2009":462.1,"2010":463.1,"2011":462.2,"2012":466.0,"2013":464.8,"2014":465.3,"2015":464.3,"2016":467.4,"2017":463.7,"2018":463.4,"2019":468.4,"2020":468.5,"2021":468.5},"안흥":{"1989":353.8,"1990":354.4,"1991":352.2,"1992":354.5,"1993":351.2,"1994":352.5,"1995":352.6,"1996":353.6,"1997":352.2,"1998":357.0,"1999":359.2,"2000":356.1,"2001":358.5,"2002":357.7,"2003":358.0,"2004":359.2,"2005":357.6,"2006":359.2,"2007":356.1,"2008":356.9,"2009":357.8,"2010":358.0,"2011":356.5,"2012":361.0,"2013":358.0,"2014":357.5,"2015":360.4,"2016":363.0,"2017":357.7,"2018":358.8,"2019":361.3,"2020":363.1,"2021":364.6},"보령":{"1989":390.7,"1990":390.8,"1991":390.5,"1992":390.7,"1993":385.9,"1994":389.8,"1995":387.4,"1996":386.0,"1997":388.0,"1998":391.8,"1999":391.8,"2000":394.6,"2001":395.3,"2002":396.1,"2003":396.3,"2004":396.2,"2005":391.1,"2006":393.9,"2007":394.8,"2008":392.9,"2009":395.0,"2010":395.3,"2011":393.5,"2012":397.5,"2013":396.0,"2014":396.9,"2015":397.0,"2016":399.4,"2017":395.0,"2018":395.1,"2019":398.8,"2020":398.7,"2021":401.6},"군산":{"1989":363.6,"1990":365.0,"1991":368.4,"1992":367.2,"1993":359.8,"1994":363.3,"1995":361.6,"1996":362.4,"1997":365.0,"1998":369.5,"1999":369.7,"2000":369.1,"2001":368.5,"2002":369.7,"2003":372.7,"2004":370.7,"2005":365.7,"2006":366.7,"2007":369.7,"2008":368.9,"2009":368.4,"2010":370.0,"2011":368.7,"2012":372.1,"2013":370.6,"2014":371.3,"2015":372.0,"2016":375.0,"2017":371.2,"2018":370.2,"2019":373.2,"2020":375.8,"2021":377.6},"위도":{"1989":332.4,"1990":330.9,"1991":330.9,"1992":331.1,"1993":327.6,"1994":330.1,"1995":332.4,"1996":331.5,"1997":334.0,"1998":336.4,"1999":334.1,"2000":333.7,"2001":336.0,"2002":336.3,"2003":335.3,"2004":335.2,"2005":335.2,"2006":335.2,"2007":335.9,"2008":334.2,"2009":336.0,"2010":336.9,"2011":335.2,"2012":337.8,"2013":336.4,"2014":338.1,"2015":337.7,"2016":340.7,"2017":336.1,"2018":337.3,"2019":338.9,"2020":343.0,"2021":346.1},"목포":{"1989":238.4,"1990":237.5,"1991":240.5,"1992":240.6,"1993":239.2,"1994":238.3,"1995":237.6,"1996":238.3,"1997":239.7,"1998":238.3,"1999":244.0,"2000":241.8,"2001":244.1,"2002":246.0,"2003":244.8,"2004":244.3,"2005":239.9,"2006":243.2,"2007":242.4,"2008":240.3,"2009":240.9,"2010":244.6,"2011":242.9,"2012":244.8,"2013":245.1,"2014":245.5,"2015":244.5,"2016":247.3,"2017":244.5,"2018":245.4,"2019":247.9,"2020":250.1,"2021":251.5},"흑산도":{"1989":184.9,"1990":184.2,"1991":185.0,"1992":184.9,"1993":183.2,"1994":185.2,"1995":183.1,"1996":182.6,"1997":183.8,"1998":186.8,"1999":188.2,"2000":188.1,"2001":190.2,"2002":190.3,"2003":190.4,"2004":190.3,"2005":186.2,"2006":188.9,"2007":188.6,"2008":186.7,"2009":188.3,"2010":189.3,"2011":187.3,"2012":192.0,"2013":189.7,"2014":190.9,"2015":189.0,"2016":192.7,"2017":191.3,"2018":192.3,"2019":192.4,"2020":194.2,"2021":194.7},"추자도":{"1989":172.3,"1990":171.6,"1991":172.8,"1992":173.2,"1993":169.1,"1994":171.6,"1995":169.0,"1996":168.7,"1997":172.5,"1998":175.4,"1999":174.6,"2000":173.5,"2001":172.9,"2002":175.2,"2003":175.4,"2004":175.8,"2005":174.2,"2006":176.4,"2007":177.4,"2008":175.2,"2009":176.0,"2010":175.9,"2011":173.7,"2012":178.3,"2013":175.2,"2014":178.6,"2015":179.1,"2016":181.3,"2017":176.9,"2018":176.6,"2019":178.8,"2020":180.1,"2021":181.3},"제주":{"1989":156.8,"1990":156.7,"1991":157.4,"1992":158.7,"1993":154.6,"1994":159.3,"1995":157.2,"1996":157.1,"1997":160.7,"1998":161.2,"1999":160.5,"2000":158.9,"2001":160.0,"2002":160.9,"2003":160.5,"2004":162.4,"2005":159.2,"2006":162.9,"2007":161.4,"2008":159.9,"2009":161.5,"2010":161.9,"2011":159.4,"2012":164.0,"2013":162.3,"2014":163.5,"2015":164.7,"2016":167.5,"2017":162.6,"2018":162.9,"2019":164.9,"2020":167.5,"2021":168.4},"서귀포":{"1989":159.6,"1990":159.1,"1991":160.4,"1992":162.5,"1993":159.8,"1994":163.0,"1995":160.2,"1996":160.2,"1997":163.6,"1998":165.2,"1999":165.5,"2000":166.1,"2001":166.3,"2002":166.9,"2003":166.5,"2004":166.7,"2005":163.2,"2006":166.7,"2007":166.1,"2008":166.2,"2009":165.8,"2010":165.9,"2011":164.1,"2012":168.2,"2013":165.6,"2014":166.9,"2015":167.7,"2016":170.7,"2017":167.3,"2018":167.3,"2019":169.7,"2020":169.7,"2021":170.9},"거문도":{"1989":179.3,"1990":178.1,"1991":180.0,"1992":181.0,"1993":178.0,"1994":179.5,"1995":177.3,"1996":178.2,"1997":181.0,"1998":183.3,"1999":184.0,"2000":181.0,"2001":182.1,"2002":184.1,"2003":183.8,"2004":182.3,"2005":178.7,"2006":181.4,"2007":183.3,"2008":181.9,"2009":183.1,"2010":181.8,"2011":180.0,"2012":185.9,"2013":184.3,"2014":185.9,"2015":185.1,"2016":190.3,"2017":184.6,"2018":183.4,"2019":186.7,"2020":187.7,"2021":190.3},"완도":{"1989":204.1,"1990":204.7,"1991":206.8,"1992":207.1,"1993":203.1,"1994":205.1,"1995":202.8,"1996":203.6,"1997":205.1,"1998":208.6,"1999":208.5,"2000":206.7,"2001":206.9,"2002":208.4,"2003":208.8,"2004":207.2,"2005":205.0,"2006":208.5,"2007":208.7,"2008":207.2,"2009":209.4,"2010":210.1,"2011":208.0,"2012":212.1,"2013":208.1,"2014":211.2,"2015":211.2,"2016":214.2,"2017":209.4,"2018":209.7,"2019":211.2,"2020":211.4,"2021":214.0},"여수":{"1989":182.9,"1990":180.9,"1991":183.2,"1992":183.9,"1993":181.3,"1994":182.6,"1995":179.4,"1996":180.1,"1997":181.9,"1998":186.1,"1999":186.3,"2000":183.8,"2001":187.4,"2002":185.8,"2003":185.9,"2004":182.9,"2005":181.4,"2006":185.5,"2007":185.9,"2008":185.0,"2009":185.8,"2010":186.6,"2011":186.4,"2012":188.4,"2013":185.3,"2014":187.9,"2015":187.9,"2016":191.7,"2017":186.2,"2018":185.6,"2019":188.9,"2020":189.7,"2021":190.4},"통영":{"1989":147.3,"1990":144.9,"1991":146.4,"1992":147.5,"1993":144.9,"1994":145.9,"1995":143.1,"1996":143.9,"1997":145.6,"1998":149.1,"1999":149.0,"2000":146.1,"2001":147.0,"2002":147.8,"2003":148.5,"2004":148.3,"2005":145.6,"2006":148.0,"2007":148.4,"2008":147.0,"2009":148.5,"2010":149.0,"2011":146.8,"2012":151.4,"2013":148.8,"2014":151.1,"2015":151.1,"2016":154.8,"2017":150.4,"2018":149.1,"2019":152.0,"2020":152.1,"2021":152.8},"가덕도":{"1989":102.3,"1990":100.3,"1991":101.4,"1992":102.0,"1993":99.2,"1994":101.2,"1995":98.0,"1996":98.9,"1997":101.3,"1998":103.7,"1999":104.7,"2000":100.5,"2001":102.0,"2002":103.6,"2003":104.9,"2004":103.4,"2005":99.7,"2006":105.2,"2007":103.5,"2008":101.1,"2009":100.6,"2010":101.0,"2011":101.8,"2012":106.3,"2013":104.8,"2014":107.6,"2015":108.1,"2016":111.8,"2017":106.6,"2018":105.6,"2019":108.9,"2020":110.5,"2021":109.3},"부산":{"1989":69.0,"1990":66.4,"1991":69.7,"1992":70.1,"1993":67.3,"1994":68.2,"1995":66.2,"1996":66.2,"1997":68.6,"1998":72.0,"1999":71.9,"2000":70.1,"2001":70.6,"2002":71.6,"2003":71.4,"2004":70.9,"2005":68.9,"2006":71.2,"2007":71.0,"2008":70.4,"2009":73.2,"2010":74.6,"2011":73.7,"2012":74.8,"2013":70.0,"2014":74.3,"2015":74.2,"2016":77.3,"2017":74.6,"2018":72.7,"2019":76.5,"2020":77.1,"2021":77.6},"울산":{"1989":32.0,"1990":28.7,"1991":29.8,"1992":31.0,"1993":29.4,"1994":31.1,"1995":31.0,"1996":28.2,"1997":29.7,"1998":32.9,"1999":32.5,"2000":30.9,"2001":30.9,"2002":33.4,"2003":33.0,"2004":32.9,"2005":30.9,"2006":34.1,"2007":32.3,"2008":31.0,"2009":32.8,"2010":32.7,"2011":31.5,"2012":36.2,"2013":33.2,"2014":36.8,"2015":37.2,"2016":40.5,"2017":35.8,"2018":34.4,"2019":37.0,"2020":38.4,"2021":38.7},"포항":{"1989":19.6,"1990":18.1,"1991":19.1,"1992":20.2,"1993":18.8,"1994":17.9,"1995":16.4,"1996":16.9,"1997":18.8,"1998":20.8,"1999":21.5,"2000":21.1,"2001":20.6,"2002":23.0,"2003":17.2,"2004":19.6,"2005":17.7,"2006":19.0,"2007":20.5,"2008":20.2,"2009":21.7,"2010":22.8,"2011":21.6,"2012":25.6,"2013":24.5,"2014":25.0,"2015":26.0,"2016":29.6,"2017":25.5,"2018":27.6,"2019":30.6,"2020":33.4,"2021":32.9},"속초":{"1989":22.0,"1990":20.8,"1991":21.6,"1992":23.4,"1993":21.6,"1994":22.5,"1995":21.4,"1996":21.1,"1997":22.2,"1998":24.3,"1999":24.5,"2000":25.0,"2001":24.0,"2002":26.2,"2003":23.3,"2004":25.1,"2005":23.7,"2006":23.1,"2007":26.5,"2008":24.6,"2009":25.0,"2010":26.6,"2011":25.7,"2012":30.2,"2013":27.7,"2014":28.1,"2015":28.7,"2016":32.6,"2017":28.5,"2018":26.5,"2019":29.6,"2020":34.0,"2021":32.0},"묵호":{"1989":18.5,"1990":17.2,"1991":17.4,"1992":19.8,"1993":18.0,"1994":18.7,"1995":17.6,"1996":16.9,"1997":18.6,"1998":19.8,"1999":20.1,"2000":20.6,"2001":18.7,"2002":21.3,"2003":20.3,"2004":22.9,"2005":21.8,"2006":21.6,"2007":22.4,"2008":21.2,"2009":21.5,"2010":23.2,"2011":20.3,"2012":23.5,"2013":22.5,"2014":23.2,"2015":23.6,"2016":28.5,"2017":23.1,"2018":21.6,"2019":24.8,"2020":28.6,"2021":26.5},"울릉도":{"1989":23.8,"1990":20.8,"1991":19.5,"1992":16.8,"1993":9.9,"1994":10.7,"1995":18.6,"1996":13.0,"1997":13.4,"1998":20.8,"1999":28.9,"2000":26.8,"2001":19.8,"2002":20.3,"2003":25.4,"2004":29.6,"2005":21.5,"2006":24.4,"2007":22.3,"2008":19.1,"2009":25.9,"2010":17.8,"2011":21.5,"2012":32.0,"2013":33.7,"2014":30.3,"2015":34.9,"2016":36.7,"2017":29.7,"2018":23.3,"2019":33.3,"2020":31.0,"2021":33.2}};
+const TEMP_PERIODS = ['1991-2000','2001-2010','2011-2020'];
+const TEMP_PERIOD_X = [1995.5, 2005.5, 2015.5];
+const TEMP_FUTURE_YEARS = [2040, 2060, 2080];
+const SEA_ANCHOR_YEARS = [1990, 2000, 2010, 2021, 2040, 2060, 2080];
+const SEA_NEAREST_REGION = {
+  '서울':'인천','부천':'인천','시흥':'인천','안산':'인천','수원':'인천','화성':'인천','고양':'인천','김포':'인천','파주':'인천','성남':'인천','용인':'인천',
+  '대전':'보령','세종':'보령','청주':'보령','천안':'보령','공주':'보령','전주':'군산','익산':'군산','광주':'목포','나주':'목포','순천':'여수',
+  '대구':'포항','경주':'포항','구미':'포항','안동':'포항','창원':'부산','김해':'부산','양산':'부산','진주':'통영',
+  '강릉':'묵호','춘천':'속초','원주':'묵호','제천':'묵호','울릉':'울릉도','제주시':'제주','서귀포시':'서귀포'
+};
+let selectedCity = '서울';
+let currentTemp = 1.5;
+let dailyLifeText = '';
+
+function normalizeCityName(name){
+  const raw=(name||'서울').trim().replace(/\s+/g,'');
+  if(!raw) return '서울';
+  if(TEMP_NORMALS[raw] || SEA_LEVEL_DATA[raw] || SEA_NEAREST_REGION[raw]) return raw;
+  let city=raw.replace(/(광역시|특별시|특별자치도|특별자치시)$/,'');
+  if(TEMP_NORMALS[city] || SEA_LEVEL_DATA[city] || SEA_NEAREST_REGION[city]) return city;
+  city=city.replace(/(시|군|구)$/,'');
+  return city || raw || '서울';
+}
+function getTempColor(t){if(t===0)return'#2196F3';if(t<=1)return'#FFC107';if(t<=1.5)return'#FF9800';if(t<=2)return'#FF5722';if(t<=3)return'#E53935';return'#9C27B0';}
+function getTempStation(city){
+  if(TEMP_NORMALS[city]) return city;
+  const candidates=[city+'시', city+'군', city+'구'];
+  return candidates.find(c=>TEMP_NORMALS[c]) || null;
+}
+function getSeaRegion(city){
+  if(SEA_LEVEL_DATA[city]) return {region:city, exact:true};
+  const mapped = SEA_NEAREST_REGION[city] || '인천';
+  return {region:SEA_LEVEL_DATA[mapped] ? mapped : '인천', exact:false};
+}
+function linearPredict(xs, ys, target){
+  if(!xs.length || !ys.length) return NaN;
+  if(xs.length===1) return +(ys[0] + (target-xs[0])*0.025).toFixed(1);
+  const n=xs.length, xMean=xs.reduce((a,b)=>a+b,0)/n, yMean=ys.reduce((a,b)=>a+b,0)/n;
+  let num=0, den=0;
+  for(let i=0;i<n;i++){num+=(xs[i]-xMean)*(ys[i]-yMean);den+=(xs[i]-xMean)*(xs[i]-xMean);}
+  const slope=den===0?0.025:num/den;
+  const intercept=yMean-slope*xMean;
+  return +(intercept+slope*target).toFixed(1);
+}
+function linearSlope(xs, ys){
+  if(!xs.length || !ys.length) return 0;
+  if(xs.length===1) return 0.01;
+  const n=xs.length, xMean=xs.reduce((a,b)=>a+b,0)/n, yMean=ys.reduce((a,b)=>a+b,0)/n;
+  let num=0, den=0;
+  for(let i=0;i<n;i++){num+=(xs[i]-xMean)*(ys[i]-yMean);den+=(xs[i]-xMean)*(xs[i]-xMean);}
+  return den===0 ? 0.01 : num/den;
+}
+function getTempSeries(city, scenarioTemp=currentTemp){
+  const station=getTempStation(city); if(!station) return null;
+  const normal=TEMP_NORMALS[station];
+  const historicalLabels=[], historicalValues=[], historicalXs=[];
+  TEMP_PERIODS.forEach((p,i)=>{
+    const v=normal[p];
+    if(v!==undefined && v!==null && !Number.isNaN(+v)){
+      historicalLabels.push(p);
+      historicalValues.push(+v);
+      historicalXs.push(TEMP_PERIOD_X[i]);
+    }
+  });
+  if(!historicalValues.length) return null;
+  const lastX=historicalXs[historicalXs.length-1];
+  const lastValue=historicalValues[historicalValues.length-1];
+  // 과거 관측값에서 일시적으로 감소한 도시도 미래 예측선은 하락하지 않도록 보정합니다.
+  // 국내 장기 온난화 경향을 반영해 최소한 완만한 상승세(0.01°C/년)를 유지합니다.
+  const observedSlope=linearSlope(historicalXs, historicalValues);
+  const futureSlope=Math.max(0.01, observedSlope);
+  let prev=lastValue;
+  const future=TEMP_FUTURE_YEARS.map(y=>{
+    const scenarioBoost=scenarioTemp * ((y-2020)/60);
+    let predicted=lastValue + futureSlope*(y-lastX) + scenarioBoost;
+    predicted=Math.max(predicted, prev+0.1);
+    prev=predicted;
+    return +predicted.toFixed(1);
+  });
+  return {station, labels:[...historicalLabels, ...TEMP_FUTURE_YEARS.map(String)], values:[...historicalValues, ...future], historicalCount:historicalValues.length};
+}
+function getSeaSeries(city, scenarioTemp=currentTemp){
+  const seaInfo=getSeaRegion(city), data=SEA_LEVEL_DATA[seaInfo.region] || SEA_LEVEL_DATA['인천'];
+  const years=Object.keys(data).map(Number).sort((a,b)=>a-b), values=years.map(y=>+data[y]);
+  const labels=SEA_ANCHOR_YEARS.map(String);
+  const lastYear=years[years.length-1], lastValue=values[values.length-1];
+  // 미래 해수면은 txt 과거 데이터의 연도별 상승 추세를 기준으로 예측합니다.
+  // 슬라이더의 지구 평균 온도 상승값은 추세를 조금 조정할 뿐, 실측값에 큰 임의 보정값을 더하지 않습니다.
+  const trend2080=linearPredict(years, values, 2080);
+  // 미래 해수면 예측은 과거 자료의 추세를 바탕으로 하되,
+  // 교육용 정확성을 위해 현재 국내 해수면 상승률 수준인 연 4mm 내외(0.4cm/년)를 넘지 않도록 제한합니다.
+  const rawSlope=Math.max(0, (trend2080-lastValue)/(2080-lastYear));
+  const observedSlope=Math.min(0.45, rawSlope || 0.4);
+  const scenarioMultiplier=1 + (Math.max(0, scenarioTemp)/4)*0.08;
+  const series=SEA_ANCHOR_YEARS.map(y=>{
+    if(data[y]!==undefined) return +data[y];
+    return +(lastValue + observedSlope*(y-lastYear)*scenarioMultiplier).toFixed(1);
+  });
+  return {...seaInfo, labels, values:series, years, rawValues:values, historicalCount:4};
+}
+function setCityExample(city){document.getElementById('cityNameInput').value=city;applyCityClimate();}
+function applyCityClimate(){
+  selectedCity = normalizeCityName(document.getElementById('cityNameInput').value);
+  document.getElementById('cityNameInput').value = selectedCity;
+  updateSim(currentTemp);
+}
+function setTemp(v){document.getElementById('tempSlider').value=v;updateSim(v);}
+function updateSim(val){
+  currentTemp=parseFloat(val);
+  const disp=document.getElementById('tempDisplay');
+  disp.textContent=`+${currentTemp}°C`;disp.style.color=getTempColor(currentTemp);
+  drawCityTempChart();
+  drawTempSeaChart();
+  updateClimateSummary();
+}
+function updateClimateSummary(){
+  document.getElementById('summaryCity').textContent=selectedCity;
+  const tempSeries=getTempSeries(selectedCity);
+  document.getElementById('summaryTemp').textContent=tempSeries ? `${tempSeries.values[tempSeries.values.length-1]}°C` : '데이터 없음';
+  const seaSeries=getSeaSeries(selectedCity);
+  document.getElementById('summarySea').textContent=`${seaSeries.values[seaSeries.values.length-1]}cm`;
+  const cityDesc=document.getElementById('cityChartDesc');
+  if(tempSeries){
+    const usedPeriods=tempSeries.labels.slice(0,tempSeries.historicalCount).join(' · ');
+    cityDesc.textContent=`${selectedCity}: 엑셀 파일에서 확인되는 ${usedPeriods} 평균기온과 선택한 지구 평균 온도 상승값을 반영한 2040 · 2060 · 2080 예측값입니다.`;
+  }
+  else cityDesc.textContent=`${selectedCity}: 엑셀 파일에서 같은 이름의 도시 평균기온 데이터를 찾지 못했습니다.`;
+  const seaDesc=document.getElementById('seaChartDesc');
+  if(seaDesc) seaDesc.textContent=seaSeries.exact ? `${selectedCity} 지역의 해수면 그래프입니다. txt 파일 관측값의 변화 추세를 바탕으로 2040 · 2060 · 2080 예측값을 함께 보여줘요.` : `${selectedCity} 지역과 가까운 ${seaSeries.region} 지역의 해수면 그래프입니다. txt 파일 관측값의 변화 추세를 바탕으로 2040 · 2060 · 2080 예측값을 함께 보여줘요.`;
+}
+function setupCanvas(canvas){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(320,Math.floor(rect.width*dpr));
+  canvas.height=Math.max(180,Math.floor(rect.height*dpr));
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w:rect.width,h:rect.height};
+}
+function drawAxes(ctx,w,h,pad){
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#FAFDFF';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='#CFD8DC';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke();
+  ctx.fillStyle='#78909C';ctx.font='10px Noto Sans KR';
+}
+function drawLine(ctx,points,color,dashed){
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=3;if(dashed)ctx.setLineDash([5,4]);ctx.beginPath();
+  points.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=color;points.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fill();});ctx.restore();
+}
+function drawNoData(ctx,w,h,msg){
+  ctx.fillStyle='#78909C';ctx.font='700 13px Noto Sans KR';ctx.textAlign='center';ctx.fillText(msg,w/2,h/2);ctx.textAlign='left';
+}
+function drawCityTempChart(){
+  const canvas=document.getElementById('cityTempChart');if(!canvas)return;
+  const {ctx,w,h}=setupCanvas(canvas),pad=38;
+  const series=getTempSeries(selectedCity);
+  drawAxes(ctx,w,h,pad);
+  if(!series){drawNoData(ctx,w,h,'엑셀 파일에 해당 도시 기온 데이터가 없어요');return;}
+  const values=series.values;
+  // 실측 구간이 슬라이더에 따라 움직여 보이지 않도록 Y축 범위는 최대 시나리오(+4°C) 기준으로 고정합니다.
+  const axisSeries=getTempSeries(selectedCity,4) || series;
+  const axisValues=[...values, ...axisSeries.values];
+  const min=Math.floor(Math.min(...axisValues)-1), max=Math.ceil(Math.max(...axisValues)+1);
+  ctx.fillStyle='#546E7A';ctx.font='10px Noto Sans KR';
+  for(let i=0;i<=4;i++){const val=min+(max-min)*i/4;const y=h-pad-(val-min)/(max-min)*(h-pad*2);ctx.strokeStyle='#ECEFF1';ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke();ctx.fillText(val.toFixed(0)+'°C',5,y+3);}
+  const pts=values.map((v,i)=>({x:pad+i*(w-pad*2)/(values.length-1),y:h-pad-(v-min)/(max-min)*(h-pad*2)}));
+  drawLine(ctx,pts.slice(0,series.historicalCount),'#E53935',false);
+  const predictStart=Math.max(0,series.historicalCount-1);
+  drawLine(ctx,pts.slice(predictStart),'#FF9800',true);
+  series.labels.forEach((lbl,i)=>{
+    ctx.save();ctx.fillStyle='#78909C';ctx.font='8.5px Noto Sans KR';ctx.textAlign='center';
+    ctx.translate(pts[i].x,h-10);ctx.rotate(-Math.PI/7);ctx.fillText(lbl,0,0);ctx.restore();
+  });
+  ctx.fillStyle='#263238';ctx.font='700 12px Noto Sans KR';ctx.fillText(`${selectedCity} 평균기온`,pad,18);
+  ctx.fillStyle='#E53935';ctx.font='10px Noto Sans KR';ctx.fillText('실선: 엑셀 데이터',pad,34);
+  ctx.fillStyle='#FF9800';ctx.fillText('점선: 예측',pad+90,34);
+  ctx.fillStyle=getTempColor(currentTemp);ctx.font='900 15px Noto Sans KR';ctx.fillText(`2080년 ${values[values.length-1]}°C`,w-112,22);
+}
+function drawTempSeaChart(){
+  const canvas=document.getElementById('tempSeaChart');if(!canvas)return;
+  const {ctx,w,h}=setupCanvas(canvas),pad=40;
+  const series=getSeaSeries(selectedCity), values=series.values;
+  // txt 실측 구간이 슬라이더에 따라 움직여 보이지 않도록 Y축 범위는 최대 시나리오(+4°C) 기준으로 고정합니다.
+  const axisSeries=getSeaSeries(selectedCity,4);
+  const axisValues=[...values, ...axisSeries.values];
+  const min=Math.floor(Math.min(...axisValues)-3), max=Math.ceil(Math.max(...axisValues)+3);
+  drawAxes(ctx,w,h,pad);
+  ctx.fillStyle='#546E7A';ctx.font='10px Noto Sans KR';
+  for(let i=0;i<=4;i++){const val=min+(max-min)*i/4;const y=h-pad-(val-min)/(max-min)*(h-pad*2);ctx.strokeStyle='#ECEFF1';ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke();ctx.fillText(val.toFixed(0)+'cm',4,y+3);}
+  const pts=values.map((v,i)=>({x:pad+i*(w-pad*2)/(values.length-1),y:h-pad-(v-min)/(max-min)*(h-pad*2)}));
+  drawLine(ctx,pts.slice(0,4),'#0277BD',false);
+  drawLine(ctx,pts.slice(3),'#00ACC1',true);
+  series.labels.forEach((lbl,i)=>{ctx.fillStyle='#78909C';ctx.font='9px Noto Sans KR';ctx.fillText(lbl,pts[i].x-13,h-12);});
+  ctx.fillStyle='#263238';ctx.font='700 12px Noto Sans KR';ctx.fillText(series.exact ? `${selectedCity} 해수면(cm)` : `${selectedCity}와 가까운 ${series.region} 해수면(cm)`,pad,18);
+  ctx.fillStyle='#0277BD';ctx.font='10px Noto Sans KR';ctx.fillText('실선: txt 실측 데이터',pad,34);
+  ctx.fillStyle='#00ACC1';ctx.fillText('점선: 예측',pad+84,34);
+  ctx.fillStyle='#0277BD';ctx.font='900 15px Noto Sans KR';ctx.fillText(`2080년 ${values[values.length-1]}cm`,w-122,22);
+}
+function onDailyLifeInput(){
+  dailyLifeText=(document.getElementById('dailyLifeInput')?.value||'').trim();
+  document.getElementById('generateClimateBtn').disabled=dailyLifeText.length<2;
+  document.getElementById('generatedWrap').style.display='none';
+  document.getElementById('aiResult').style.display='none';
+}
+function climateHash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}
+  return Math.abs(h);
+}
+function pickByHash(arr, seed, offset=0){
+  return arr[(seed+offset)%arr.length];
+}
+function getDailyLifeClimateFocus(life){
+  const raw=(life||'').trim();
+  const text=raw.toLowerCase();
+  const seed=climateHash(raw+'|'+selectedCity+'|'+currentTemp);
+
+  function scenario(title, change, visual, keywords){
+    return {title, change, visual, keywords};
+  }
+  function choose(list){return pickByHash(list, seed, list.length);}
+
+  if(/겨울|눈사람|눈싸움|눈\s*놀이|눈놀이|썰매|스키|스케이트|폭설|한파|크리스마스|눈이|눈 오는|눈오는|눈길|빙판/.test(text)){
+    const activity=/눈사람/.test(text)?'눈사람 만들기':(/눈싸움|눈\s*놀이|눈놀이/.test(text)?'눈싸움':'눈놀이');
+    return choose([
+      scenario(
+        '눈이 빨리 녹는 겨울',
+        `겨울 평균기온이 올라가면 눈이 비로 바뀌거나, 내린 눈이 오래 쌓이지 않고 빨리 녹을 수 있어요. 그래서 ${activity}를 할 수 있는 날이 줄고, 운동장에는 하얀 눈밭보다 젖은 바닥과 물웅덩이가 더 자주 보일 수 있어요.`,
+        `Korean elementary school winter playground after global warming, children trying ${activity}, very little patchy melting snow, slush, puddles, wet ground, unfinished small snowman or tiny snowballs, winter coats, warm cloudy winter sky, no autumn leaves, no green grass`,
+        '빨리 녹는 눈, 물웅덩이, 질척한 운동장, 짧아진 눈놀이 시간'
+      ),
+      scenario(
+        '눈 대신 비가 오는 겨울',
+        `날씨가 따뜻해지면 겨울에도 눈 대신 비나 진눈깨비가 내리는 날이 생길 수 있어요. 이런 날에는 눈을 뭉치기 어렵고 옷과 신발이 젖어서 ${activity}보다 실내 활동을 하게 될 수 있어요.`,
+        `Korean elementary students in winter coats on a wet winter playground, rain and sleet instead of snow, children holding umbrellas, no snowman possible, wet shoes, puddles, grey warm winter sky, clear global warming winter change, no fall season`,
+        '눈 대신 비, 진눈깨비, 젖은 신발, 실내 활동 증가'
+      ),
+      scenario(
+        '갑자기 많이 오는 무거운 눈',
+        `지구온난화가 되어도 추운 공기가 남아 있는 날에는 따뜻한 공기 속 수증기 때문에 무겁고 많은 눈이 갑자기 내릴 수 있어요. 이때는 ${activity}를 즐기기보다 길이 미끄럽고 나뭇가지가 무거워져 안전을 먼저 살펴야 해요.`,
+        `Korean school winter scene with sudden heavy wet snow caused by warmer moist air, children watching safely, slippery path, heavy snow on tree branches, warning cones, winter coats, educational realistic climate change scene`,
+        '무거운 폭설, 미끄러운 길, 안전 확인, 따뜻한 공기의 수증기'
+      )
+    ]);
+  }
+
+  if(/운동|축구|농구|야구|달리|체육|운동장|놀이터|공원|밖|야외|줄넘기|피구/.test(text)){
+    const activity=/축구/.test(text)?'축구':(/농구/.test(text)?'농구':(/야구/.test(text)?'야구':(/줄넘기/.test(text)?'줄넘기':'야외 활동')));
+    return choose([
+      scenario(
+        '폭염 때문에 짧아지는 야외 활동',
+        `폭염이 더 자주 오면 운동장 바닥이 뜨겁게 달아올라 ${activity}를 오래 하기 어려울 수 있어요. 땀을 많이 흘리기 때문에 물을 자주 마시고, 그늘에서 쉬는 시간이 늘어날 수 있어요.`,
+        `Korean elementary school playground in extreme heat, children doing ${activity} but sweating heavily, blazing sun, orange heat haze, dry dusty ground, teacher guiding children to shade, water bottles, shade tent, thermometer showing hot weather`,
+        '폭염, 뜨거운 운동장, 땀, 물병, 그늘막'
+      ),
+      scenario(
+        '실내로 바뀌는 체육 시간',
+        `기온이 너무 높거나 열사병 위험이 커지는 날에는 운동장 수업이 줄고 실내 활동으로 바뀔 수 있어요. 친구들과 뛰어노는 시간은 줄지만, 건강을 지키기 위해 쉬는 시간과 물 마시는 시간이 더 중요해져요.`,
+        `school sports class moved indoors because of heat wave, hot empty playground outside window with heat shimmer, students drinking water indoors, fans, heat warning poster without readable text, realistic Korean elementary classroom gym`,
+        '열사병 위험, 실내 활동, 물 마시기, 비어 있는 뜨거운 운동장'
+      ),
+      scenario(
+        '갑작스러운 폭우로 멈추는 놀이',
+        `더워진 공기는 수증기를 더 많이 머금을 수 있어서 갑자기 강한 비가 내리는 날도 늘 수 있어요. 운동장 놀이가 갑자기 중단되고, 물이 고인 길을 피해 안전하게 이동해야 할 수 있어요.`,
+        `Korean school playground after sudden heavy rain, children stopping outdoor game, puddles on field, dark rain clouds and humid hot air, students with raincoats moving to covered walkway, realistic educational climate change scene`,
+        '강한 소나기, 물 고인 운동장, 놀이 중단, 안전 이동'
+      )
+    ]);
+  }
+
+  if(/등교|하교|버스|정류장|걷|자전거|길|도로|학교 가|집에 가|횡단보도/.test(text)){
+    return choose([
+      scenario(
+        '뜨거워지는 등하굣길',
+        '폭염이 심해지면 아스팔트와 버스 정류장이 매우 뜨거워질 수 있어요. 등하교할 때 그늘을 찾아 걷고, 모자와 물병을 챙기는 일이 더 중요해질 수 있어요.',
+        `Korean elementary students commuting in extreme heat, hot asphalt road shimmering, bus stop with small shade, students with hats and water bottles, strong sunlight, dry roadside plants, realistic climate adaptation scene`,
+        '뜨거운 아스팔트, 강한 햇볕, 모자, 물병, 그늘'
+      ),
+      scenario(
+        '갑자기 위험해지는 길',
+        '강한 비가 짧은 시간에 많이 내리면 낮은 길이나 횡단보도에 물이 고일 수 있어요. 평소 가던 길도 돌아가야 하거나, 안전한 곳에서 비가 약해지기를 기다려야 할 수 있어요.',
+        `Korean school commute after sudden heavy rainfall, flooded crosswalk and low road, students waiting safely under shelter, umbrellas, wet shoes, traffic cones, cloudy sky, realistic educational scene`,
+        '폭우, 침수된 횡단보도, 돌아가는 길, 안전 대기'
+      ),
+      scenario(
+        '자전거 타기 어려운 날',
+        '더운 날과 강한 비·바람이 늘어나면 자전거로 이동하기 좋은 날이 줄 수 있어요. 헬멧과 날씨 확인이 더 중요해지고, 너무 덥거나 비가 심한 날에는 대중교통을 이용할 수 있어요.',
+        `child with bicycle checking weather, hot windy street, heat shimmer, sudden rain clouds, safe bus stop nearby, Korean neighborhood, realistic climate change daily life`,
+        '폭염, 강풍, 폭우, 자전거 안전, 날씨 확인'
+      )
+    ]);
+  }
+
+  if(/급식|점심|밥|식사|음식|간식|도시락|과일|채소|농작물|김치|쌀/.test(text)){
+    return choose([
+      scenario(
+        '더 조심해야 하는 음식 보관',
+        '더운 날이 많아지면 음식이 쉽게 상할 수 있어요. 급식이나 도시락은 더 시원하고 깨끗하게 보관해야 하고, 손 씻기와 물 마시기도 더 중요해질 수 있어요.',
+        `elementary school lunch in hotter climate, students drinking water, lunch trays, food kept in cool containers, bright hot sunlight through window, fans, thermometer, realistic Korean school cafeteria`,
+        '더위, 음식 보관, 물 마시기, 위생'
+      ),
+      scenario(
+        '달라질 수 있는 식재료',
+        '폭염과 가뭄이 잦아지면 채소와 과일이 자라기 어려운 해가 생길 수 있어요. 급식에 나오는 식재료가 바뀌거나, 우리가 먹는 음식의 가격이 오를 수도 있어요.',
+        `school lunch tray with fewer vegetables and climate notice visual, dry farm scene visible through window or poster, hot sunlight, students learning about crops, realistic educational Korean school scene`,
+        '가뭄, 폭염, 농작물 변화, 식재료 변화'
+      ),
+      scenario(
+        '물 마시는 시간이 늘어나는 점심시간',
+        '날씨가 더워지면 점심시간에도 갈증을 더 자주 느낄 수 있어요. 시원한 물을 마시고, 너무 더운 공간에서는 선풍기나 그늘이 있는 곳에서 쉬는 시간이 필요해질 수 있어요.',
+        `hot school lunch break, children drinking water more often, bright summer heat outside, shaded rest corner, fans, realistic educational image, Korean elementary students`,
+        '갈증, 물 마시기, 더운 점심시간, 휴식'
+      )
+    ]);
+  }
+
+  if(/바다|강|하천|해변|낚시|물놀이|수영|계곡|섬|항구/.test(text)){
+    return choose([
+      scenario(
+        '좁아질 수 있는 해변',
+        '지구가 더워지면 바닷물 높이가 조금씩 올라가 해변이 좁아질 수 있어요. 물놀이를 하던 공간이 줄거나, 낮은 길에 바닷물이 차서 더 조심해야 할 수 있어요.',
+        `Korean beach affected by sea level rise, narrower beach, water close to walkway, children standing safely on higher ground, warning ropes, realistic educational climate change scene, not disaster`,
+        '해수면 상승, 좁아진 해변, 낮은 길 침수, 안전한 위치'
+      ),
+      scenario(
+        '갑자기 불어나는 강물',
+        '폭우가 짧은 시간에 많이 내리면 강이나 하천 물이 빠르게 불어날 수 있어요. 물가에서 놀 때는 날씨 알림을 확인하고, 비가 오면 바로 안전한 곳으로 이동해야 해요.',
+        `Korean riverside after heavy rain, swollen river, children observing from safe high path with adult, rain clouds, wet ground, safety fence, realistic educational scene`,
+        '폭우, 불어난 강물, 물가 안전, 높은 곳으로 이동'
+      ),
+      scenario(
+        '달라지는 바다 생물',
+        '바닷물이 따뜻해지면 물고기와 해양 생물이 살기 좋은 곳이 달라질 수 있어요. 우리가 보던 바다 풍경이나 낚시할 때 만나는 생물도 달라질 수 있어요.',
+        `warm sea climate change scene, Korean harbor or beach, different fish species illustration, warmer ocean, children learning near water safely, realistic educational image`,
+        '따뜻해진 바닷물, 해양 생물 변화, 달라진 바다 풍경'
+      )
+    ]);
+  }
+
+  if(/캠핑|등산|숲|산|나무|소풍|여행|공원|자연|꽃|벌레|곤충|모기/.test(text)){
+    return choose([
+      scenario(
+        '산불 위험이 커지는 숲 활동',
+        '가뭄과 폭염이 길어지면 숲이 바짝 마르고 산불 위험이 커질 수 있어요. 캠핑이나 등산을 할 때 불 사용 규칙이 더 엄격해지고, 일부 구역은 들어가지 못할 수도 있어요.',
+        `Korean forest campsite in drought and heat, dry leaves, yellow dry grass, no open fire sign without readable text, children camping safely with adult, distant smoky haze, realistic educational not scary`,
+        '가뭄, 마른 숲, 산불 위험, 출입 제한'
+      ),
+      scenario(
+        '그늘을 더 찾게 되는 공원',
+        '더운 날이 늘어나면 공원이나 소풍 장소에서도 그늘과 물을 찾는 시간이 늘어날 수 있어요. 낮보다 아침이나 저녁에 활동하는 일이 많아질 수 있어요.',
+        `Korean park picnic under climate warming, strong sun, children gathering under shade, water bottles, dry grass patches, heat shimmer, realistic educational scene`,
+        '강한 햇볕, 그늘 찾기, 물병, 활동 시간 변화'
+      ),
+      scenario(
+        '늘어날 수 있는 벌레와 알레르기',
+        '따뜻한 기간이 길어지면 모기나 진드기 같은 벌레가 활동하는 시기가 길어질 수 있어요. 야외 활동을 할 때 긴 옷, 벌레 기피제, 손 씻기가 더 중요해질 수 있어요.',
+        `children in Korean park wearing light long sleeves, mosquitoes visible subtly, warm extended season, bug spray, shaded area, realistic child-friendly climate change adaptation`,
+        '따뜻한 기간 증가, 벌레 활동, 긴 옷, 야외 안전'
+      )
+    ]);
+  }
+
+  if(/강아지|고양이|반려동물|산책|동물|애완/.test(text)){
+    return choose([
+      scenario(
+        '뜨거운 바닥과 반려동물 산책',
+        '폭염이 심해지면 낮 시간의 아스팔트가 너무 뜨거워져 반려동물의 발바닥이 다칠 수 있어요. 산책은 이른 아침이나 저녁처럼 덜 더운 시간으로 바뀔 수 있어요.',
+        `Korean neighborhood dog walk during heat wave, child checking hot pavement with hand, dog wearing paw protection, strong sunlight, heat shimmer, evening or early morning alternative shown, realistic educational`,
+        '뜨거운 아스팔트, 반려동물 발, 산책 시간 변화'
+      ),
+      scenario(
+        '더 자주 쉬어야 하는 산책',
+        '더운 날에는 사람뿐 아니라 반려동물도 쉽게 지칠 수 있어요. 산책 중 그늘에서 쉬고 물을 마시는 시간이 더 자주 필요해질 수 있어요.',
+        `child and dog resting in shade during hot climate, water bowl, bright sun, dry sidewalk, realistic Korean neighborhood, child-friendly educational image`,
+        '더위, 그늘 휴식, 물 마시기, 산책 변화'
+      )
+    ]);
+  }
+
+  if(/집|방|에어컨|선풍기|잠|잠자|밤|열대야|공부|교실|학교|수업/.test(text)){
+    return choose([
+      scenario(
+        '밤에도 식지 않는 더위',
+        '밤에도 기온이 잘 내려가지 않는 열대야가 늘면 잠을 깊이 자기 어려울 수 있어요. 다음 날 학교생활을 잘하려면 시원한 실내 환경과 충분한 물 마시기가 더 중요해져요.',
+        `Korean child's bedroom during tropical night heat, fan, open window with warm night city, child trying to sleep, water cup, thermometer, realistic educational scene`,
+        '열대야, 잠 부족, 선풍기, 물 마시기'
+      ),
+      scenario(
+        '더워지는 교실과 집중력',
+        '더운 날이 많아지면 교실에서도 쉽게 지치고 집중하기 어려운 시간이 생길 수 있어요. 환기, 그늘막, 에너지 절약 냉방처럼 건강과 기후를 함께 생각하는 준비가 필요해져요.',
+        `Korean elementary classroom in heat wave, students fanning themselves and drinking water, sunlight through windows, blinds, energy-saving cooling, realistic educational climate scene`,
+        '더운 교실, 집중 어려움, 환기, 에너지 절약 냉방'
+      )
+    ]);
+  }
+
+  return choose([
+    scenario(
+      '더위가 바꾸는 평범한 하루',
+      '지구온난화가 계속되면 더운 날이 늘어나 평소 하던 활동도 쉬는 시간이 더 필요해질 수 있어요. 물을 챙기고, 그늘을 찾고, 가장 더운 시간대를 피하는 일이 일상 속에서 더 중요해져요.',
+      `ordinary Korean elementary student daily life affected by global warming, strong sunlight, heat haze, dry ground, water bottle, shade, students adapting safely, realistic educational scene`,
+      '폭염, 그늘, 물 마시기, 활동 시간 변화'
+    ),
+    scenario(
+      '갑작스러운 날씨 변화가 있는 하루',
+      '기후가 변하면 맑다가도 갑자기 강한 비가 내리는 날이 늘 수 있어요. 밖에서 활동할 때 날씨를 더 자주 확인하고, 비가 심할 때는 안전한 곳으로 이동해야 해요.',
+      `Korean everyday school life with sudden heavy rain after hot weather, students moving under shelter, puddles, humid heat, umbrellas, realistic educational climate scene`,
+      '강한 비, 물웅덩이, 날씨 확인, 안전 이동'
+    ),
+    scenario(
+      '계절감이 달라지는 하루',
+      '지구가 더워지면 계절이 시작되고 끝나는 느낌이 달라질 수 있어요. 봄꽃이 빨리 피거나, 가을 더위가 길어지는 것처럼 평소의 계절 활동도 조금씩 바뀔 수 있어요.',
+      `Korean neighborhood showing changed seasons from climate warming, early blossoms and lingering heat, students noticing seasonal changes, realistic child-friendly educational image`,
+      '계절 변화, 빨라진 봄, 길어진 더위, 일상 변화'
+    )
+  ]);
+}
+
+function buildClimateStory(){
+  const tempSeries=getTempSeries(selectedCity);
+  const temp=tempSeries ? tempSeries.values[tempSeries.values.length-1]+'°C' : '데이터 없음';
+  const life=(document.getElementById('dailyLifeInput')?.value||'').trim();
+  const focus=getDailyLifeClimateFocus(life);
+  const seed=climateHash(life+selectedCity+currentTemp);
+  const endings=[
+    '이런 변화가 커지지 않도록 에너지 절약과 탄소 줄이기 실천이 중요해요.',
+    '날씨가 달라질수록 건강과 안전을 먼저 생각하는 습관도 필요해요.',
+    '기후 변화는 먼 미래 이야기가 아니라, 우리가 좋아하는 일상 장면에도 영향을 줄 수 있어요.',
+    '작은 실천이 모이면 이런 변화를 늦추고 오늘의 일상을 지키는 데 도움이 돼요.'
+  ];
+  return `${focus.change}\n\n2080년 ${selectedCity}의 평균기온은 ${temp}로 예상돼요. ${pickByHash(endings, seed, endings.length)}`;
+}
+
+function getClimateSeasonInstruction(life){
+  const t=(life||'').toLowerCase();
+  if(/겨울|눈|눈사람|눈싸움|썰매|스키|스케이트|한파|크리스마스/.test(t)) return 'winter: show a warmer changed winter only when winter or snow is clearly mentioned';
+  if(/봄|꽃|벚꽃|소풍|새싹/.test(t)) return 'spring: show spring daily life changed by warming, such as earlier flowers, stronger pollen, warmer afternoon';
+  if(/가을|단풍|추석|낙엽|운동회/.test(t)) return 'autumn: show autumn daily life changed by lingering heat, delayed leaves, dry ground';
+  return 'not winter: choose spring, summer, or autumn that best matches the activity; do not show snow, snowman, winter coats, or a winter landscape';
+}
+function buildClimatePrompt(){
+  const tempSeries=getTempSeries(selectedCity);
+  const temp=tempSeries ? tempSeries.values[tempSeries.values.length-1] : 'unknown';
+  const life=(document.getElementById('dailyLifeInput')?.value||'').trim();
+  const focus=getDailyLifeClimateFocus(life);
+  const story=buildClimateStory().replace(/\n/g,' ');
+  const seasonRule=getClimateSeasonInstruction(life);
+  return `Create ONE coherent realistic educational image for elementary students. The image must match this exact climate-change explanation: ${story}. Main scene: ${focus.visual}. Climate signs: ${focus.keywords}. Season rule: ${seasonRule}. Show the student's daily life changed by global warming, not the normal original activity. Make the image and explanation describe the same situation. If the explanation says melting snow, show melting patchy snow and puddles; if it says heat wave, show blazing sun, sweating, water bottles and shade; if it says heavy rain, show puddles, rain gear and safe shelter; if it says sea level rise, show higher water and safe distance. Location: ${selectedCity}, Korea, year 2080, predicted average temperature ${temp}°C. Realistic, child-friendly, Korean elementary school or neighborhood, no text labels, no unrelated season, no generic climate poster, not scary, not a disaster movie.`; 
+}
+
+const STABLE_DIFFUSION_API_URL='https://script.google.com/macros/s/AKfycbz_AJtDmGW29XUcP2PFNZLkWhC48uK472DPGyzHAtyXYJuw2CknimL9D0SfeSUgQJHJ/exec';
+
+const GEMINI_TEXT_API_URL='https://script.google.com/macros/s/AKfycbzLNorB-B6g18_k_QR1NoPUhCnGtTdj_ApJUiatbhz7gueTCDIGbn56i6SGbnQCP-ja/exec';
+
+const CARBON_GUIDE_REFERENCE_TEXT=`탄소중립 생활 실천 안내서 가정편 요약. kg은 kgCO2eq/년 기준.
+탄소중립은 온실가스 배출량과 흡수량이 균형을 이루어 이산화탄소 순배출량을 0으로 만드는 것이다.
+1.5도 온난화와 2도 온난화의 영향은 다르다. 1.5도에서는 해수면 0.26~0.77m 상승, 2도에서는 0.3~0.93m 상승으로 제시된다.
+가정 에너지 실천: 불필요한 조명 끄기 251kg/가구, 세탁기 사용 횟수 줄이기 9kg/대, 전기밥솥 보온 시간 줄이기 458kg/가구, 전기장판 사용 시간 줄이기 315kg/가구, TV 시청 시간 줄이기 73kg/대, 가전제품 대기전력 차단 85kg/가구, 비데 절전기능 42kg/대, 고효율 가전제품 216kg/제품군, 고효율 조리기구 75kg/가구, 냉장고 에너지 효율 높이기 42kg/대, 절수 설비·기기 25kg/가구, 난방온도 2도 낮추고 냉방온도 2도 높이기 150kg/가구, 창틀과 문틈 바람막이 153kg/가구, 친환경 저녹스 보일러 886kg/가구.
+소비 실천: 녹색제품 구매 3kg/인, 우리나라·지역·제철 식재료 이용 132kg/인, 다회용기에 내용물만 구매 0.9kg/인, 물 받아서 사용 8kg/가구.
+수송 실천: 개인용 자동차 대신 대중교통 이용 242kg/대, 가까운 거리는 걷거나 자전거 이용 147kg/대, 자동차 공유 서비스 이용 시 무공해차 이용 10kg/인, 무공해차 구매 1216kg/대, 친환경 운전 498kg/대.
+자원순환 실천: 비닐 사용 줄이기 25kg/인, 음식물 쓰레기 줄이기 0.5kg/인, 음식 포장·배달 시 1회용품 줄이기 2kg/인, 1회용 컵 대신 다회용 컵 사용 87kg/인, 컵 홀더 줄이기 0.03kg/인, 물티슈 덜 쓰기 16kg/인, 개인 손수건 사용 55kg/인, 인쇄 시 종이 사용 줄이기 15kg/인, 전자 영수증·청구서 0.8kg/인, 재활용을 위한 분리배출 19kg/인.
+디지털 탄소발자국: 유튜브 10분 시청 1g, 인터넷 검색 0.2g, 이메일 한 통 4g, 전화통화 1분 3.6g, 데이터 1MB당 11g.
+분리배출 핵심: 투명 페트병은 내용물 비우기, 라벨 제거, 압착 후 뚜껑 닫기, 전용 수거함 배출. 음식물이 묻어 제거되지 않는 용기, 깨진 병, 도자기, 고무장갑, 기저귀 등은 재활용품으로 오해하기 쉽다.
+음식물 쓰레기 줄이기: 식단계획과 유통기한을 고려해 필요한 만큼 구매하고, 식재료는 소분 보관하며, 먹지 않을 반찬은 미리 반납한다.
+대중교통과 걷기·자전거는 자동차 사용을 줄여 탄소 배출을 줄이고 건강에도 도움이 된다.
+다회용 컵은 1회용 컵 사용을 줄여 1인당 연간 87kg 감축 효과가 있다.
+불끄기는 조명기구를 장시간 사용하는 가정에서 효과가 크며 가구당 연간 251kg 감축 효과가 있다.
+`;
+
+function getRelevantCarbonGuideText(prompt){
+  const p=String(prompt||'').toLowerCase();
+  const chunks=[];
+  function add(t){if(t && !chunks.includes(t))chunks.push(t);}
+  const common='탄소중립은 온실가스 배출량과 흡수량이 균형을 이루어 이산화탄소 순배출량을 0으로 만드는 것이다. kg은 kgCO2eq/년 기준이다.';
+  add(common);
+  if(/불|조명|소등|전등/.test(p)) add('불필요한 조명기구 소등하기는 가구당 연간 251kgCO2eq 감축 효과가 있다. 사용하지 않는 조명은 끄고 지구의 날 소등행사에도 참여할 수 있다.');
+  if(/텀블러|컵|다회용/.test(p)) add('1회용 컵 대신 다회용 컵 사용하기는 1인당 연간 87kgCO2eq 감축 효과가 있다. 실내에서는 개인 컵을 쓰고 외출할 때는 텀블러를 사용할 수 있다.');
+  if(/버스|대중교통|지하철|자동차/.test(p)) add('개인용 자동차 대신 대중교통 이용하기는 1대당 연간 242kgCO2eq 감축 효과가 있다. 연간 주 1회 대중교통 이용 확대를 기준으로 산정했다.');
+  if(/자전거|걷|걸어|도보/.test(p)) add('가까운 거리는 걷거나 자전거 이용하기는 1대당 연간 147kgCO2eq 감축 효과가 있다. 매일 3km 도보 또는 자전거 이용을 기준으로 산정했다.');
+  if(/분리|재활용|페트|플라스틱/.test(p)) add('재활용을 위한 분리배출 실천하기는 1인당 연간 19kgCO2eq 감축 효과가 있다. 투명 페트병은 내용물 비우기, 라벨 제거, 압착 후 뚜껑 닫기, 전용 수거함 배출이 핵심이다.');
+  if(/비닐|봉투|장바구니/.test(p)) add('비닐 사용 줄이기는 1인당 연간 25kgCO2eq 감축 효과가 있다. 물건을 살 때 장바구니를 들고 가고 속비닐 사용을 줄일 수 있다.');
+  if(/음식|급식|잔반|쓰레기|밥/.test(p)) add('음식물 쓰레기 줄이기는 1인당 연간 0.5kgCO2eq 감축 효과가 있다. 식단계획과 유통기한을 고려해 필요한 만큼 구매하고 먹지 않을 반찬은 미리 반납한다.');
+  if(/냉방|에어컨|난방|온도|더위|폭염/.test(p)) add('난방온도 2℃ 낮추고 냉방온도 2℃ 높이기는 가구당 연간 150kgCO2eq 감축 효과가 있다. 에어컨은 선풍기와 함께 쓰고 햇볕을 커튼으로 줄이면 도움이 된다.');
+  if(/디지털|메일|유튜브|검색|데이터|컴퓨터/.test(p)) add('디지털 탄소발자국 자료에 따르면 유튜브 10분 시청은 1g, 인터넷 검색은 0.2g, 이메일 한 통은 4g, 전화통화 1분은 3.6g, 데이터 1MB는 11g의 온실가스 배출과 관련된다.');
+  if(/종이|영수증|인쇄/.test(p)) add('인쇄 시 종이 사용 줄이기는 1인당 연간 15kgCO2eq, 전자 영수증·청구서 이용은 1인당 연간 0.8kgCO2eq 감축 효과가 있다.');
+  if(/나무|숲|산림|흡수원/.test(p)) add('30년생 중부지방 소나무 1그루의 연간 이산화탄소 흡수량은 9.1kg 기준으로 제시된다. 전 지구적으로 산림은 매년 약 26억 t의 이산화탄소를 흡수한다.');
+  if(chunks.length<3) add('가정 실천수칙에는 에너지, 소비, 수송, 자원순환, 흡수원 분야가 있으며 총 43개 실천수칙이 제시되어 있다.');
+  return chunks.join('\n').slice(0,900);
+}
+
+const FILE_FALLBACK_PREFIX='__FILE_FALLBACK__';
+function splitShortSentences(text, max=4){
+  return String(text||'')
+    .replace(/\s+/g,' ')
+    .split(/(?<=[.!?。！？요다니다])\s+/)
+    .map(x=>x.trim())
+    .filter(Boolean)
+    .slice(0,max)
+    .join('\n');
+}
+function ensurePoliteSentence(s){
+  let t=String(s||'').trim();
+  if(!t)return '';
+  t=t
+    .replace(/것이다\.?$/,'것이에요.')
+    .replace(/기준이다\.?$/,'기준이에요.')
+    .replace(/제시된다\.?$/,'제시돼요.')
+    .replace(/관련된다\.?$/,'관련돼요.')
+    .replace(/있다\.?$/,'있어요.')
+    .replace(/한다\.?$/,'해요.')
+    .replace(/된다\.?$/,'돼요.')
+    .replace(/이다\.?$/,'이에요.');
+  if(!/[.!?。！？]$/.test(t)){
+    if(/(요|니다|다)$/.test(t)) t+='.';
+    else t+='요.';
+  }
+  return t;
+}
+function fourLineAnswer(lines){
+  const out=lines.map(ensurePoliteSentence).filter(Boolean).slice(0,4);
+  while(out.length<4) out.push('생활 속 작은 실천을 꾸준히 하는 것이 중요해요.');
+  return out.join('\n');
+}
+function limitSentenceLength(sentence, maxLen=42){
+  let t=ensurePoliteSentence(sentence).replace(/\*+$/,'').trim();
+  if(t.length<=maxLen) return [t];
+  const end=(t.match(/[.!?。！？]$/)||['.'])[0];
+  t=t.replace(/[.!?。！？]$/,'').trim();
+  const parts=t.split(/(?<=때문에|그래서|그리고|또한|하지만|이며|이고|하고|지만|거나|수 있어요|입니다|예요|이에요|돼요|해요)|[,，]/).map(x=>x.trim()).filter(Boolean);
+  const out=[];
+  let cur='';
+  for(const part of parts){
+    if(!cur) cur=part;
+    else if((cur+' '+part).length<=maxLen) cur+=' '+part;
+    else{out.push(ensurePoliteSentence(cur)); cur=part;}
+  }
+  if(cur) out.push(ensurePoliteSentence(cur));
+  if(out.length===1 && out[0].length>maxLen){
+    const words=t.split(/\s+/).filter(Boolean);
+    const rebuilt=[]; let line='';
+    for(const w of words){
+      if(!line) line=w;
+      else if((line+' '+w).length<=maxLen) line+=' '+w;
+      else{rebuilt.push(ensurePoliteSentence(line)); line=w;}
+    }
+    if(line) rebuilt.push(ensurePoliteSentence(line));
+    return rebuilt.length?rebuilt:[ensurePoliteSentence(t.slice(0,maxLen))];
+  }
+  return out.map(ensurePoliteSentence);
+}
+function localCarbonGuideAnswer(prompt){
+  const p=String(prompt||'');
+  const qMatch=p.match(/질문:\s*([\s\S]*)$/);
+  const question=(qMatch?qMatch[1]:p).trim();
+
+  if(/학생의 일상|일상 변화|기후교육 웹앱/.test(p)){
+    const base=splitShortSentences(buildClimateStory(),4).split('\n');
+    return fourLineAnswer(base);
+  }
+
+  if(/실천일기|오늘 실천|피드백/.test(p)){
+    const m=p.match(/절감량은\s*([^\s]+)\s*CO₂|절감량은\s*([^\s]+)g/i);
+    const amount=(m&&(m[1]||m[2]))?String(m[1]||m[2]).replace('g',''):'오늘의';
+    return fourLineAnswer([
+      `오늘 실천으로 ${amount}g CO₂를 줄였어요.`,
+      '작은 행동도 매일 반복하면 탄소중립에 도움이 돼요.',
+      '오늘처럼 생활 속에서 실천을 찾는 태도가 중요해요.',
+      '다음에는 한 가지 실천을 더 이어가 보세요.'
+    ]);
+  }
+
+  if(/비닐|봉투|일회용\s*봉투|플라스틱/.test(question)) return fourLineAnswer([
+    '비닐봉지는 한 번 쓰고 버려지는 경우가 많아요.',
+    '만들고 버리는 과정에서 온실가스와 쓰레기가 생겨요.',
+    '안내서에는 비닐 사용 줄이기가 1인당 연간 25kgCO2eq 감축 효과가 있다고 나와요.',
+    '장바구니를 쓰면 비닐봉지를 줄이는 데 도움이 돼요.'
+  ]);
+  if(/장바구니/.test(question)) return fourLineAnswer([
+    '장바구니를 쓰면 비닐봉지를 덜 사용할 수 있어요.',
+    '비닐을 만들고 버릴 때 생기는 온실가스와 쓰레기를 줄여요.',
+    '앱 기준으로 장바구니 실천은 4g CO₂ 줄이기로 계산돼요.',
+    '물건을 살 때 장바구니를 챙기면 좋은 실천이에요.'
+  ]);
+  if(/텀블러|다회용\s*컵|컵/.test(question)) return fourLineAnswer([
+    '텀블러를 쓰면 1회용 컵 사용을 줄일 수 있어요.',
+    '안내서에는 다회용 컵 사용이 1인당 연간 87kgCO2eq 감축 효과가 있다고 나와요.',
+    '카페나 학교에서 개인 컵을 쓰면 쓰레기도 줄어들어요.',
+    '매일 한 번씩만 써도 좋은 실천이 됩니다.'
+  ]);
+  if(/버스|대중교통|지하철/.test(question)) return fourLineAnswer([
+    '버스나 지하철을 타면 자동차 사용을 줄일 수 있어요.',
+    '안내서에는 대중교통 이용이 1대당 연간 242kgCO2eq 감축 효과가 있다고 나와요.',
+    '가까운 곳은 걷거나 자전거를 이용해도 좋아요.',
+    '이동 습관을 바꾸면 공기를 깨끗하게 하는 데 도움이 됩니다.'
+  ]);
+  if(/자전거|걷|걸어|도보/.test(question)) return fourLineAnswer([
+    '가까운 거리는 걷거나 자전거를 타면 좋아요.',
+    '자동차를 덜 타서 온실가스를 줄일 수 있어요.',
+    '안내서에는 걷기와 자전거 이용이 1대당 연간 147kgCO2eq 감축 효과가 있다고 나와요.',
+    '건강에도 도움이 되는 실천이에요.'
+  ]);
+  if(/분리|재활용|페트/.test(question)) return fourLineAnswer([
+    '분리배출은 새 자원을 덜 쓰게 도와줘요.',
+    '안내서에는 분리배출 실천이 1인당 연간 19kgCO2eq 감축 효과가 있다고 나와요.',
+    '투명 페트병은 비우고 라벨을 떼서 배출해요.',
+    '깨끗하게 분리해야 다시 자원으로 쓰기 쉬워요.'
+  ]);
+  if(/불|조명|소등|전등/.test(question)) return fourLineAnswer([
+    '불필요한 조명을 끄면 전기 사용을 줄일 수 있어요.',
+    '안내서에는 조명 소등이 가구당 연간 251kgCO2eq 감축 효과가 있다고 나와요.',
+    '사용하지 않는 방의 불부터 꺼 보세요.',
+    '작은 습관이 모이면 에너지 절약에 도움이 됩니다.'
+  ]);
+  if(/음식|급식|잔반|밥/.test(question)) return fourLineAnswer([
+    '음식물 쓰레기를 줄이면 처리 과정의 온실가스를 줄일 수 있어요.',
+    '안내서에는 음식물 쓰레기 줄이기가 1인당 연간 0.5kgCO2eq 감축 효과가 있다고 나와요.',
+    '먹을 만큼만 받고 남기지 않는 것이 중요해요.',
+    '급식에서도 작은 실천을 바로 할 수 있습니다.'
+  ]);
+
+  const ref=getRelevantCarbonGuideText(question);
+  const lines=ref.split('\n').filter(Boolean).map(ensurePoliteSentence);
+  return fourLineAnswer(lines.length?lines:['탄소중립은 온실가스 배출을 줄이고 흡수와 균형을 맞추는 일이에요.','생활 속 작은 실천도 탄소 줄이기에 도움이 돼요.','앱 기준 수치를 참고해 쉬운 행동부터 시작할 수 있어요.','궁금한 실천을 하나 더 물어봐 주세요.']);
+}
+
+function callGeminiText(prompt){
+  const safePrompt=String(prompt||'').slice(0,2200);
+
+  function fallback(){
+    return FILE_FALLBACK_PREFIX + localCarbonGuideAnswer(prompt);
+  }
+
+  function requestGeminiModel(modelName, timeoutMs){
+    return new Promise((resolve,reject)=>{
+      const cb='geminiCb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+      const script=document.createElement('script');
+      let finished=false;
+
+      function cleanup(){
+        try{delete window[cb];}catch(e){window[cb]=undefined;}
+        if(script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[cb]=function(data){
+        if(finished)return;
+        finished=true;
+        cleanup();
+        if(data && data.success && data.text){
+          const sourceFlag=String(data.source||data.mode||data.provider||'').toLowerCase();
+          if(/file|fallback|local/.test(sourceFlag)) reject(new Error('파일 기반 응답이 반환되어 Gemini 모델을 다시 시도합니다.'));
+          else resolve(String(data.text).trim());
+        }else{
+          const msg=(data && data.error) ? String(data.error) : 'Gemini 응답에 text가 없습니다.';
+          reject(new Error(msg));
+        }
+      };
+
+      script.onerror=function(){
+        if(finished)return;
+        finished=true;
+        cleanup();
+        reject(new Error(modelName+' 호출 실패'));
+      };
+
+      // Gemini API를 먼저 사용하도록 요청합니다. 파일 기반 답변은 API 실패·쿼터·시간초과 때만 사용합니다.
+      const qs=new URLSearchParams({
+        callback:cb,
+        prompt:safePrompt,
+        model:modelName,
+        preferredModel:modelName,
+        modelOrder:'gemini-2.5-flash,gemini-2.5-flash-lite',
+        useGeminiFirst:'true',
+        fileFallbackOnlyOnError:'true',
+        forceGeminiOnly:'true',
+        allowFileFallback:'false',
+        useFileFallback:'false',
+        fallback:'none',
+        source:'gemini',
+        t:String(Date.now())
+      });
+      script.async=true;
+      script.src=GEMINI_TEXT_API_URL+'?'+qs.toString();
+      document.body.appendChild(script);
+
+      setTimeout(()=>{
+        if(finished)return;
+        finished=true;
+        cleanup();
+        reject(new Error(modelName+' 응답 시간 초과'));
+      },timeoutMs||7000);
+    });
+  }
+
+  return requestGeminiModel('gemini-2.5-flash',25000)
+    .catch(()=>requestGeminiModel('gemini-2.5-flash-lite',25000))
+    .catch(()=>fallback());
+}
+
+function buildGeminiClimateStoryPrompt(life){
+  const tempSeries=getTempSeries(selectedCity);
+  const seaSeries=getSeaSeries(selectedCity);
+  const temp=tempSeries ? tempSeries.values[tempSeries.values.length-1]+'°C' : '데이터 없음';
+  const sea=seaSeries ? seaSeries.values[seaSeries.values.length-1]+'cm' : '데이터 없음';
+  const focus=getDailyLifeClimateFocus(life);
+  const seasonRule=getClimateSeasonInstruction(life);
+  return `너는 초등학교 5학년용 기후교육 웹앱의 글 생성 AI야.
+규칙:
+- 초등학교 5학년이 이해할 말로 답해.
+- 짧고 간결하게 약 4문장으로만 쓰되, 모든 문장은 끝까지 완성해.
+- 한 문장은 42자 안팎으로 짧게 써.
+- 각 줄은 한 문장으로 쓰고 줄바꿈으로 구분해.
+- 학생이 쓴 문장을 다시 반복하지 마.
+- 학생의 일상이 지구온난화로 어떻게 달라지는지만 설명해.
+- 이미지와 같은 장면이 떠오르도록 핵심 변화 1가지를 분명하게 말해.
+- 필요 없는 제목, 목록, 굵게 표시 기호, 마크다운을 쓰지 마.
+- 모든 문장 끝에 별표를 붙이지 마. 답변의 가장 마지막 문장 끝에만 *를 딱 1개 붙여.
+- 말투는 반드시 ~요 또는 ~입니다로 끝내.
+- 반드시 수치 1개 이상을 자연스럽게 넣어. 사용할 수치: 지역 ${selectedCity}, 2080년 예상 평균기온 ${temp}, 가까운 해수면 ${sea}, 선택한 지구 평균 온도 상승 +${currentTemp}°C.
+- 겨울이나 눈이 입력에 없으면 겨울, 눈, 눈사람, 두꺼운 겨울옷 이야기를 하지 마.
+- 계절 규칙을 따라 봄, 여름, 가을 중 입력 내용에 맞는 계절로 설명해. 계절 규칙: ${seasonRule}
+- 같은 표현을 반복하지 말고, 입력된 일상의 핵심을 반영해 새롭게 설명해.
+- 과장된 재난 표현은 쓰지 마.
+학생의 일상: ${life}
+이미지와 맞춰야 할 핵심 기후 변화 방향: ${focus.change}`;
+}
+
+function buildGeminiDiaryPrompt(acts,text,co2){
+  const actText=acts.length?acts.join(', '):'선택한 행동 없음';
+  return `너는 초등학교 5학년의 탄소중립 실천일기에 피드백을 주는 AI야.
+규칙:
+- 초등학교 5학년 수준으로 답해.
+- 반드시 ~요 또는 ~입니다 말투로 답해.
+- 짧고 간결한 문장 약 4개만 쓰되, 모든 문장은 끝까지 완성해.
+- 한 문장은 42자 안팎으로 짧게 써.
+- 모든 문장 끝에 별표를 붙이지 마. 답변의 가장 마지막 문장 끝에만 *를 딱 1개 붙여.
+- 일기 내용과 오늘 실천에만 답해.
+- 이전 피드백처럼 똑같이 말하지 말고, 칭찬 방식과 다음 실천 제안을 다양하게 바꿔.
+- 정확한 수치를 1개 이상 넣어. 오늘 앱에서 계산된 절감량은 ${co2}g CO₂야.
+- 관련 있으면 아래 수치를 활용해: 장바구니 4g, 반찬통 2g, 자전거 40g, 버스 200g, 다 먹은 급식 0.1g, 분리수거 17g, 텀블러 4g, 불끄기 68g.
+- 마지막에 다음에 해볼 실천 1가지만 제안해.
+오늘 실천: ${actText}
+일기 내용: ${text||'없음'}`;
+}
+
+function buildGeminiChatPrompt(q){
+  return `너는 초등학교 5학년용 기후위기·탄소중립 챗봇이야.
+질문: ${q}
+반드시 지킬 규칙:
+- 질문에 묻는 내용만 답해. 관련 없는 설명을 붙이지 마.
+- Gemini API가 먼저 직접 답해. 파일 근거 답변은 API 실패, 쿼터 초과, 시간 초과일 때만 사용해.
+- 초등학교 5학년 수준으로 답해.
+- 약 4문장으로만 답하되, 모든 문장은 끝까지 완성해.
+- 한 문장은 42자 안팎으로 짧게 써.
+- 반드시 ~요 또는 ~입니다 말투로 답해.
+- 모든 문장 끝에 별표를 붙이지 마. 답변의 가장 마지막 문장 끝에만 *를 딱 1개 붙여.
+- 정확한 데이터나 수치를 1개 이상 사용해. 질문과 관련 있는 수치만 골라 써.
+- 모르는 수치는 지어내지 말고, 앱 기준 수치라고 말해.
+앱 기준 수치: 장바구니 4g CO₂, 반찬통 2g CO₂, 자전거 40g CO₂, 버스 200g CO₂, 다 먹은 급식 0.1g CO₂, 분리수거 17g CO₂, 텀블러 4g CO₂, 불끄기 68g CO₂.
+추가 참고 수치: 대중교통 이용은 연간 242kgCO₂eq, 걷기/자전거 이용은 연간 147kgCO₂eq, 다회용 컵 사용은 연간 87kgCO₂eq 감축 효과가 있어.`;
+}
+
+async function callStableDiffusionXL(params={}){
+  const response=await fetch(STABLE_DIFFUSION_API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({prompt:params.prompt||''})
+  });
+  if(!response.ok)throw new Error('Apps Script 응답 오류: '+response.status);
+  return await response.json();
+}
+
+async function generateClimateImage(){
+  const life=(document.getElementById('dailyLifeInput')?.value||'').trim();
+  if(!life){alert('먼저 나의 일상을 글로 표현해 주세요.');return;}
+  dailyLifeText=life;
+  document.getElementById('aiLoading').style.display='block';
+  document.getElementById('generatedWrap').style.display='none';
+  document.getElementById('aiResult').style.display='none';
+  try{
+    const geminiPromise=callGeminiText(buildGeminiClimateStoryPrompt(life));
+    const imagePromise=callStableDiffusionXL({
+      city:selectedCity,
+      globalTemp:currentTemp,
+      dailyLife:life,
+      prompt:buildClimatePrompt()
+    });
+    const [aiText,data]=await Promise.all([geminiPromise,imagePromise]);
+    if(!data || !data.success || !data.imageUrl){
+      throw new Error((data && data.error) ? data.error : 'Stable Diffusion XL 이미지 생성 실패');
+    }
+    showGeneratedClimateResult(data.imageUrl, true, aiText);
+  }catch(e){
+    document.getElementById('aiLoading').style.display='none';
+    document.getElementById('aiResult').style.display='block';
+    document.getElementById('aiResultTitle').textContent='⚠️ AI 연결 오류';
+    document.getElementById('aiResultBody').textContent='Gemini API 또는 이미지 생성 연결에 실패했어요. 오류: '+e.message;
+  }
+}
+
+function showGeneratedClimateResult(src, realAI, aiText){
+  document.getElementById('aiLoading').style.display='none';
+  document.getElementById('climateGeneratedImg').src=src;
+  document.getElementById('generatedWrap').style.display='block';
+  const seaSeries=getSeaSeries(selectedCity), tempSeries=getTempSeries(selectedCity);
+  const sea=seaSeries.values[seaSeries.values.length-1], temp=tempSeries ? tempSeries.values[tempSeries.values.length-1]+'°C' : '데이터 없음';
+  document.getElementById('generatedCaption').textContent=`${realAI?'AI 생성':'시연용 이미지'} · ${selectedCity} · 2080년 예측 평균기온 ${temp}, ${seaSeries.region} 해수면 약 ${sea}cm`;
+  document.getElementById('aiResult').style.display='block';
+  document.getElementById('aiResultTitle').textContent='🤖 일상 변화 설명';
+  const bodyEl=document.getElementById('aiResultBody');
+  bodyEl.style.whiteSpace='pre-line';
+  bodyEl.textContent=cleanAiText(aiText || buildClimateStory());
+}
+function createDailyLifePreviewDataUrl(){
+  const seaSeries=getSeaSeries(selectedCity), tempSeries=getTempSeries(selectedCity);
+  const sea=seaSeries.values[seaSeries.values.length-1], temp=tempSeries ? tempSeries.values[tempSeries.values.length-1]+'°C' : '데이터 없음';
+  const rawLife=(document.getElementById('dailyLifeInput')?.value||'나의 일상').trim();
+  const focus=getDailyLifeClimateFocus(rawLife);
+  const life=rawLife.replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const isOutdoor=/운동|축구|농구|야구|달리|체육|운동장|놀이터|공원|밖|야외/.test(rawLife);
+  const isCommute=/등교|하교|버스|정류장|걷|자전거|길|도로|학교 가|집에 가/.test(rawLife);
+  const isWater=/바다|강|하천|해변|낚시|물놀이|수영/.test(rawLife);
+  const ground=isWater?'#29b6f6':isOutdoor?'#d7a86e':'#c8e6c9';
+  const object=isOutdoor?'<ellipse cx="410" cy="352" rx="95" ry="26" fill="#8bc34a" opacity="0.55"/><circle cx="330" cy="318" r="20" fill="#ffcc80"/><rect x="318" y="340" width="24" height="58" rx="10" fill="#42a5f5"/><path d="M302 370 L268 402 M350 370 L390 402" stroke="#263238" stroke-width="9" stroke-linecap="round"/><circle cx="512" cy="345" r="24" fill="#fff" stroke="#263238" stroke-width="4"/><path d="M650 270 C620 320 614 360 650 405 C686 360 680 320 650 270Z" fill="#66bb6a"/><rect x="642" y="345" width="16" height="78" fill="#6d4c41"/><text x="290" y="285" font-family="Noto Sans KR, sans-serif" font-size="30" font-weight="900" fill="#e53935">땀이 나요</text>':isCommute?'<rect x="120" y="285" width="260" height="100" rx="22" fill="#ffca28"/><rect x="150" y="310" width="55" height="38" fill="#e3f2fd"/><rect x="225" y="310" width="55" height="38" fill="#e3f2fd"/><circle cx="175" cy="395" r="20" fill="#263238"/><circle cx="325" cy="395" r="20" fill="#263238"/><rect x="520" y="240" width="18" height="170" fill="#455a64"/><rect x="480" y="230" width="115" height="52" rx="10" fill="#0277bd"/><text x="496" y="264" font-family="Noto Sans KR, sans-serif" font-size="22" font-weight="900" fill="white">그늘</text><circle cx="665" cy="320" r="19" fill="#ffcc80"/><rect x="655" y="340" width="22" height="58" rx="10" fill="#66bb6a"/>':'<rect x="115" y="275" width="230" height="115" rx="16" fill="#90caf9"/><rect x="145" y="305" width="48" height="45" fill="#e3f2fd"/><rect x="244" y="305" width="48" height="45" fill="#e3f2fd"/><path d="M500 260 C465 320 460 365 500 420 C540 365 535 320 500 260Z" fill="#66bb6a"/><rect x="490" y="345" width="20" height="80" fill="#6d4c41"/><circle cx="635" cy="340" r="21" fill="#ffcc80"/><rect x="623" y="362" width="24" height="54" rx="10" fill="#42a5f5"/><rect x="680" y="330" width="30" height="50" rx="8" fill="#29b6f6" opacity="0.75"/><text x="600" y="306" font-family="Noto Sans KR, sans-serif" font-size="28" font-weight="900" fill="#01579b">물을 마셔요</text>';
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+    <defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffb74d"/><stop offset="0.58" stop-color="#fff3e0"/><stop offset="1" stop-color="#e3f2fd"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="3"/></filter></defs>
+    <rect width="900" height="520" fill="url(#sky)"/>
+    <circle cx="744" cy="86" r="66" fill="#ff5722" opacity="0.92"/>
+    <circle cx="744" cy="86" r="96" fill="#ffcc80" opacity="0.38"/>
+    <path d="M40 185 C180 155 260 210 410 180 C560 150 680 205 850 175" stroke="#ffecb3" stroke-width="18" opacity="0.55" fill="none" filter="url(#blur)"/>
+    <rect x="0" y="410" width="900" height="110" fill="${ground}" opacity="0.9"/>
+    <path d="M0 430 C150 405 290 455 430 425 C590 390 735 455 900 420 L900 520 L0 520 Z" fill="#29b6f6" opacity="${isWater?'0.55':'0.18'}"/>
+    ${object}
+    <rect x="52" y="35" width="620" height="128" rx="22" fill="rgba(255,255,255,.9)"/>
+    <text x="82" y="76" font-family="Noto Sans KR, sans-serif" font-size="26" font-weight="900" fill="#b71c1c">${focus.title}</text>
+    <text x="82" y="111" font-family="Noto Sans KR, sans-serif" font-size="18" font-weight="700" fill="#263238">${selectedCity} 2080년 · 평균기온 ${temp} · 해수면 약 ${sea}cm</text>
+    <foreignObject x="72" y="173" width="760" height="92"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:Noto Sans KR,sans-serif;font-size:23px;font-weight:800;line-height:1.45;color:#263238;background:rgba(255,255,255,.84);border-radius:18px;padding:14px;">${life}</div></foreignObject>
+    <text x="70" y="482" font-family="Noto Sans KR, sans-serif" font-size="22" font-weight="900" fill="#01579b">강한 햇볕, 더위, 물 마시기, 그늘 찾기가 일상에서 더 중요해져요.</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function initClimateSim(){
+  applyCityClimate();
+  window.addEventListener('resize',()=>updateSim(currentTemp));
+}
+initClimateSim();
+let game={run:false,score:0,heat:10,time:60,items:[],timer:null,spawn:null,counts:{},speedLevel:0};
+const climateItems=[
+  {emoji:'🧺',name:'장바구니',co2:0.04,score:4},
+  {emoji:'🥣',name:'반찬통',co2:0.02,score:2},
+  {emoji:'🚲',name:'자전거',co2:0.4,score:40},
+  {emoji:'🚌',name:'버스',co2:2,score:200},
+  {emoji:'🍽️',name:'다 먹은 급식',co2:0.001,score:0.1},
+  {emoji:'♻️',name:'분리수거',co2:0.17,score:17},
+  {emoji:'🍶',name:'텀블러',co2:0.04,score:4},
+  {emoji:'🔌',name:'불끄기',co2:0.68,score:68}
+];
+// 여러 컴퓨터/IP에서 점수판을 공유하려면 여기에 저장 서버 또는 Google Apps Script 웹앱 URL을 넣으세요.
+// 비워 두면 브라우저 localStorage에만 저장됩니다.
+// 구글 시트 공유 점수판: Apps Script 배포 후 받은 웹앱 URL을 아래 따옴표 안에 붙여넣으세요.
+const SHARED_RANK_API_URL='https://script.google.com/macros/s/AKfycbzAHt0YQLvQNAy0k-mUdLR_a1mtt6T_ylacYnqCTsfUnNogewCJ7HM7Yh3jdbFkYKgn-Q/exec';
+const badItems=[
+  {emoji:'🛍',name:'비닐',heat:20},
+  {emoji:'🥤',name:'플라스틱',heat:15},
+  {emoji:'🚗',name:'자동차',heat:25},
+  {emoji:'💻',name:'컴퓨터 사용',heat:20},
+  {emoji:'🧾',name:'종이영수증',heat:5},
+  {emoji:'🛒',name:'새로운 물건구입',heat:20}
+];
+const good=climateItems.map(x=>x.emoji), bad=badItems.map(x=>x.emoji);
+const fmt=n=>Number.isInteger(n)?String(n):String(Math.round(n*1000)/1000);
+function setHud(){ $('#score').textContent=fmt(game.score); $('#time').textContent=game.time+'s'; $('#heatText').textContent=game.heat+'%'; $('#heatFill').style.width=game.heat+'%'; $('#heatFill').style.background=game.heat>70?'#e53935':game.heat>40?'#ff9800':'#43a047'}
+let faceReady=false;
+async function initFaceCamera(){
+  const video=$('#faceCam');
+  const canvas=$('#faceCanvas');
+  const ctx=canvas.getContext('2d');
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480},audio:false});
+    video.srcObject=stream;
+    await video.play();
+
+    const faceMesh=new FaceMesh({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+    faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.5,minTrackingConfidence:0.5});
+
+    faceMesh.onResults(results=>{
+      canvas.width=video.videoWidth||640;
+      canvas.height=video.videoHeight||480;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      if(results.multiFaceLandmarks && results.multiFaceLandmarks.length){
+        const lm=results.multiFaceLandmarks[0];
+        const upper=lm[13];
+        const lower=lm[14];
+        const centerX=(upper.x+lower.x)/2;
+        const centerY=(upper.y+lower.y)/2;
+
+        const box=$('#gamebox');
+        const x=(1-centerX)*box.clientWidth;
+        const y=centerY*box.clientHeight;
+
+        $('#mouth').style.left=x+'px';
+        $('#mouth').style.top=y+'px';
+        $('#mouth').style.bottom='auto';
+
+        ctx.beginPath();
+        ctx.arc((1-centerX)*canvas.width,centerY*canvas.height,22,0,Math.PI*2);
+        ctx.fillStyle='rgba(76,175,80,.75)';
+        ctx.fill();
+
+        ctx.font='22px sans-serif';
+        ctx.fillText('냠!',(1-centerX)*canvas.width+24,centerY*canvas.height-8);
+      }
+    });
+
+    const camera=new Camera(video,{onFrame:async()=>{await faceMesh.send({image:video})},width:640,height:480});
+    camera.start();
+    faceReady=true;
+    $('#cameraBtn').textContent='✅ 얼굴 인식 연결 완료';
+  }catch(e){
+    alert('카메라 권한을 허용해주세요. 카메라가 안 되면 손가락/마우스로도 조작할 수 있어요!');
+  }
+}
+
+$('#cameraBtn').onclick=initFaceCamera;
+
+$('#gamebox').onpointermove=e=>{
+  if(faceReady)return;
+  let r=$('#gamebox').getBoundingClientRect();
+  $('#mouth').style.left=(e.clientX-r.left)+'px'
+};
+function spawn(){
+  let e=document.createElement('div');
+  const pool=[...climateItems.map(x=>({...x,kind:'good'})),...badItems.map(x=>({...x,kind:'bad'}))];
+  const item=pool[Math.floor(Math.random()*pool.length)];
+  e.className='fall';
+  e.textContent=item.emoji;
+  e.dataset.kind=item.kind;
+  e.dataset.name=item.name;
+  e.style.left=Math.random()*88+'%';
+  e.style.top='-44px';
+  $('#gamebox').appendChild(e);
+  const speedBoost=game.speedLevel||0;
+  game.items.push({el:e,y:-44,s:2+Math.random()*2+speedBoost,emoji:item.emoji,name:item.name,kind:item.kind})
+}
+function tick(){if(!game.run)return; let m=$('#mouth').getBoundingClientRect(), box=$('#gamebox').getBoundingClientRect(); game.items.forEach(it=>{it.y+=it.s; it.el.style.top=it.y+'px'; let r=it.el.getBoundingClientRect(); if(Math.abs((r.left+r.width/2)-(m.left+m.width/2))<46 && Math.abs((r.top+r.height/2)-(m.top+m.height/2))<46){
+        if(it.el.dataset.kind==='good'){
+          const data=climateItems.find(x=>x.name===it.name)||climateItems.find(x=>x.emoji===it.emoji);
+          if(data){
+            game.score=Math.round((game.score+data.score)*1000)/1000;
+            game.counts[data.name]=(game.counts[data.name]||0)+1;
+          }
+
+          const fx=document.createElement('div');
+          fx.textContent='😋';
+          fx.style.position='absolute';
+          fx.style.left=it.el.style.left;
+          fx.style.top=it.y+'px';
+          fx.style.fontSize='34px';
+          fx.style.pointerEvents='none';
+          fx.style.transition='all .6s ease';
+          $('#gamebox').appendChild(fx);
+          setTimeout(()=>{fx.style.transform='translateY(-50px) scale(1.4)';fx.style.opacity='0';},10);
+          setTimeout(()=>fx.remove(),650);
+        }else{
+          const badData=badItems.find(x=>x.name===it.name)||badItems.find(x=>x.emoji===it.emoji);
+          game.heat=Math.min(100,game.heat+(badData?.heat||20));
+
+          const bad=document.createElement('div');
+          bad.textContent='🥵';
+          bad.style.position='absolute';
+          bad.style.left=it.el.style.left;
+          bad.style.top=it.y+'px';
+          bad.style.fontSize='34px';
+          bad.style.pointerEvents='none';
+          bad.style.transition='all .6s ease';
+          $('#gamebox').appendChild(bad);
+          setTimeout(()=>{bad.style.transform='translateY(-50px) scale(1.4)';bad.style.opacity='0';},10);
+          setTimeout(()=>bad.remove(),650);
+        }
+
+        it.dead=true;
+        it.el.remove();
+        setHud();
+        if(game.heat>=100) end(false)
+      }}); game.items=game.items.filter(it=>!it.dead && it.y<box.height+50); requestAnimationFrame(tick)}
+function start(){
+  game={run:true,score:0,heat:10,time:60,items:[],timer:null,spawn:null,counts:{},speedLevel:0};
+  setHud();
+  $('#gameOverlay').style.display='none';
+  $$('.fall').forEach(x=>x.remove());
+  game.spawn=setInterval(spawn,900);
+  game.timer=setInterval(()=>{
+    game.time--;
+    const elapsed=60-game.time;
+    game.speedLevel=Math.min(3, elapsed*0.045);
+    setHud();
+    if(game.time<=0)end(true)
+  },1000);
+  tick()
+}
+function end(win){
+  if(!game.run)return;
+  game.run=false;
+  clearInterval(game.spawn);
+  clearInterval(game.timer);
+  const rows=climateItems.map(item=>{
+    const count=game.counts[item.name]||0;
+    const subtotal=Math.round(item.score*count*1000)/1000;
+    return `<div class="game-summary-row"><span>${item.emoji} ${item.name} ${item.co2} kgCO₂eq/년 × ${count}회</span><b>${fmt(subtotal)}점</b></div>`;
+  }).join('');
+  const reduced=Math.round((game.score/100)*1000)/1000;
+  $('#gameOverlay').style.display='grid';
+  $('#gameOverlay').innerHTML=`<div class="game-over-panel"><h2>${win?'🎉 지구를 지켰어요!':'🌡️ 지구가 너무 더워졌어요!'}</h2><p>최종 점수: <b>${fmt(game.score)}점</b></p><div class="game-summary-list">${rows}</div><div class="game-summary-total">${fmt(reduced)} kgCO₂eq/년 이산화탄소를 감축했습니다!</div><div class="score-save-box"><input id="nick" placeholder="닉네임" maxlength="12"><div class="score-save-actions"><button class="btn green" onclick="saveScore()">점수 저장</button><button class="btn" onclick="start()">다시 하기</button></div></div></div>`;
+}
+$('#startGame').onclick=start;
+function sharedRankJsonp(params={}){
+  return new Promise((resolve,reject)=>{
+    if(!SHARED_RANK_API_URL){resolve(null);return;}
+    const cb='rankCb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const script=document.createElement('script');
+    const qs=new URLSearchParams({...params,callback:cb,t:Date.now()});
+    window[cb]=(data)=>{
+      cleanup();
+      resolve(data);
+    };
+    function cleanup(){
+      delete window[cb];
+      script.remove();
+    }
+    script.onerror=()=>{cleanup();reject(new Error('rank jsonp failed'));};
+    script.src=SHARED_RANK_API_URL+(SHARED_RANK_API_URL.includes('?')?'&':'?')+qs.toString();
+    document.body.appendChild(script);
+    setTimeout(()=>{
+      if(window[cb]){cleanup();reject(new Error('rank jsonp timeout'));}
+    },8000);
+  });
+}
+async function fetchSharedRanks(){
+  try{
+    const data=await sharedRankJsonp({action:'list'});
+    return data && Array.isArray(data.ranks)?data.ranks:null;
+  }catch(e){console.warn('공유 점수판 불러오기 실패:',e);return null;}
+}
+async function postSharedScore(entry){
+  try{
+    const data=await sharedRankJsonp({
+      action:'save',
+      n:entry.n,
+      s:entry.s,
+      co2:entry.co2,
+      counts:JSON.stringify(entry.counts||{})
+    });
+    return !!(data && data.ok);
+  }catch(e){console.warn('공유 점수 저장 실패:',e);return false;}
+}
+window.saveScore=async()=>{
+  let n=$('#nick').value.trim()||'기후히어로';
+  const entry={n,s:game.score,co2:Math.round((game.score/100)*1000)/1000,d:new Date().toLocaleDateString('ko-KR'),counts:{...game.counts}};
+  const onlineSaved=await postSharedScore(entry);
+  let ranks=store.get('rank')||[];
+  ranks.push(entry);
+  ranks=ranks.sort((a,b)=>b.s-a.s).slice(0,10);
+  store.set('rank',ranks);
+  await loadRank();
+  alert(onlineSaved?'점수를 구글 시트 공유 점수판에 저장했어요!':'구글 시트 저장에 실패해 이 기기에만 저장했어요. Apps Script 코드/배포 권한을 확인해 주세요.');
+  start();
+};
+async function loadRank(){
+  let r=await fetchSharedRanks();
+  if(!r)r=store.get('rank')||[];
+  r=r.sort((a,b)=>b.s-a.s).slice(0,10);
+  $('#rank').innerHTML=r.length?r.map((x,i)=>`<div class="rankrow"><div class="medal">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="grow"><b>${x.n}</b><br><small>${x.d||''}${x.co2!==undefined?' · '+fmt(x.co2)+' kgCO₂eq/년':''}</small></div><div class="score">${fmt(x.s)}점</div></div>`).join(''):'<p class="muted">아직 기록이 없어요. 첫 번째 영웅이 되어봐요!</p>'
+}
+loadRank();
+function cleanAiText(text){
+  let raw=String(text||'');
+  const isFileFallback=raw.startsWith(FILE_FALLBACK_PREFIX);
+  if(isFileFallback) raw=raw.slice(FILE_FALLBACK_PREFIX.length);
+  let cleaned=raw
+    .replace(/\*+/g,'')
+    .replace(/^[-•]\s*/gm,'')
+    .replace(/#{1,6}\s*/g,'')
+    .replace(/\s+$/,'')
+    .trim();
+
+  let lines=cleaned.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  if(lines.length<2){
+    lines=cleaned.split(/(?<=[.!?。！？]|요\.|니다\.|어요\.|예요\.|이에요\.)\s+/).map(x=>x.trim()).filter(Boolean);
+  }
+  lines=lines.flatMap(x=>limitSentenceLength(x,42)).slice(0,4).map(ensurePoliteSentence).filter(Boolean);
+  cleaned=lines.join('\n').trim().replace(/\*+$/,'').trim();
+  return cleaned && !isFileFallback ? cleaned + '*' : cleaned;
+}
+function isQuotaError(err){
+  return /quota|429|RESOURCE_EXHAUSTED|exceeded/i.test(String(err&&err.message?err.message:err));
+}
+function buildLocalDiaryFeedback(acts,text,co2){
+  const names=acts.map(e=>actions.find(a=>a[0]===e)?.[1]).filter(Boolean);
+  const main=names[0]||'오늘의 실천';
+  const next=names.includes('텀블러')?'분리수거도 함께 해보세요.':names.includes('분리수거')?'불끄기도 함께 해보세요.':'텀블러 사용도 해보세요.';
+  const feel=text?'느낀 점을 함께 적어서 실천이 더 분명해졌어요.':'다음에는 느낀 점도 한 줄 적어보세요.';
+  return `${main} 실천으로 오늘 ${co2}g CO₂를 줄였어요.<br>${feel}<br>작은 행동도 매일 쌓이면 큰 변화가 돼요.<br>다음 실천으로 ${next}`;
+}
+function today(){return new Date().toISOString().slice(0,10)}
+function renderChips(){ $('#chips').innerHTML=actions.map(a=>`<button class="chip" data-e="${a[0]}">${a[0]} ${a[1]}</button>`).join(''); $$('#chips .chip').forEach(c=>c.onclick=()=>{selected.has(c.dataset.e)?selected.delete(c.dataset.e):selected.add(c.dataset.e); c.classList.toggle('selected')})} renderChips();
+$('#saveDiary').onclick=async()=>{
+  let acts=[...selected], text=$('#diaryText').value.trim(), co2=acts.reduce((s,e)=>s+(actions.find(a=>a[0]===e)?.[2]||0),0);
+  if(!acts.length&&!text)return alert('실천 행동이나 느낀 점을 기록해 주세요!');
+  store.set('diary:'+today(),{date:today(),acts,text,co2});
+  $('#feedback').style.display='block';
+  $('#feedback').innerHTML=`<b>🤖 AI 피드백을 작성하고 있어요...</b>`;
+  loadDiary();
+  try{
+    const aiFeedback=cleanAiText(await callGeminiText(buildGeminiDiaryPrompt(acts,text,co2)));
+    $('#feedback').innerHTML=`<b>🌱 오늘 ${acts.length}가지 실천!</b><br>${aiFeedback.replace(/\n/g,'<br>')}`;
+  }catch(e){
+    if(isQuotaError(e)){
+      $('#feedback').innerHTML=`<b>🌱 오늘 ${acts.length}가지 실천!</b><br>${buildLocalDiaryFeedback(acts,text,co2)}<br><small>※ Gemini 무료 사용량이 잠시 초과되어 기본 피드백으로 보여줘요.</small>`;
+    }else{
+      $('#feedback').innerHTML=`<b>⚠️ Gemini API 연결 실패</b><br>${e.message}`;
+    }
+  }
+};
+function loadDiary(){let keys=store.keys('diary:').sort().reverse(), total=0; let hist=keys.map(k=>{let d=store.get(k); total+=d.co2||0; return `<div class="item"><b>${d.date} · CO₂ ${d.co2}g</b><br>${d.acts.join(' ')} ${d.text?'<br>'+d.text:''}</div>`}).join(''); $('#history').innerHTML=hist||'<p class="muted">아직 기록이 없어요.</p>'; $('#co2Total').textContent=total+'g'; let streak=0, dd=new Date(); for(let k of keys){let key='diary:'+dd.toISOString().slice(0,10); if(keys.includes(key)){streak++; dd.setDate(dd.getDate()-1)}else break} $('#streak').textContent=streak+'일'} loadDiary();
+$('#askDiary').onclick=()=>{let acts=[...selected].join(' '); openChat(); ask(`오늘 실천한 행동은 ${acts||'아직 없음'}이야. 이 행동이 기후위기에 어떤 도움이 되는지 알려줘.`)};
+$('#enter').onclick=()=>{if($('#pw').value==='1234'){$('#gate').style.display='none';$('#dash').style.display='block';loadDash()}else alert('비밀번호가 달라요')};
+function loadDash(){let keys=store.keys('diary:'), todayData=store.get('diary:'+today()), total=keys.map(k=>store.get(k)).reduce((s,d)=>s+(d.co2||0),0); $('#ds1').textContent=(todayData?1:0)+'명'; $('#ds2').textContent=(todayData?.co2||0)+'g'; $('#ds3').textContent=$('#streak').textContent; $('#ds4').textContent=(todayData?.acts?.length||0)+'개'; $('#students').innerHTML=`<div class="item"><b>나의 기록</b><br>누적 CO₂ ${total}g · 연속 ${$('#streak').textContent}</div><div class="item"><b>데모 학생</b><br>누적 CO₂ 1,200g · 연속 5일</div>`}
+function openChat(){ $('#chat').classList.add('open') } $('#chatBtn').onclick=()=>$('#chat').classList.toggle('open'); $('#send').onclick=()=>ask($('#chatInput').value); $('#chatInput').onkeydown=e=>{if(e.key==='Enter')ask($('#chatInput').value)};
+async function ask(q){
+  q=q.trim();
+  if(!q)return;
+
+  $('#chatInput').value='';
+  $('#msgs').insertAdjacentHTML('beforeend',`<div class="msg user">${q}</div>`);
+  const loadingId='geminiMsg_'+Date.now();
+  $('#msgs').insertAdjacentHTML('beforeend',`<div class="msg" id="${loadingId}">🤖 답변을 만들고 있어요...</div>`);
+  $('#msgs').scrollTop=$('#msgs').scrollHeight;
+
+  try{
+    const a=await callGeminiText(buildGeminiChatPrompt(q));
+    const el=document.getElementById(loadingId);
+    if(el) el.textContent=cleanAiText(a);
+  }catch(e){
+    const el=document.getElementById(loadingId);
+    if(el) el.textContent='Gemini API 연결에 실패했어요. 오류: '+e.message;
+  }
+  $('#msgs').scrollTop=$('#msgs').scrollHeight;
+}
+
+</script>
+</body>
+</html>
